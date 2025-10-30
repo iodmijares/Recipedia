@@ -167,7 +167,7 @@ This project is open-source and available under the [MIT License](LICENSE).
 
 **Ivan Mijares**
 - Email: iodmijares@usm.edu.ph
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: [@iodmijares](https://github.com/iodmijares)
 
 ---
 Built with ❤️ using Laravel 12 and Tailwind CSS
