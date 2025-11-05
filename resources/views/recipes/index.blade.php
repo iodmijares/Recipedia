@@ -108,7 +108,12 @@
                     </a>
                 @endforeach
             </div>
-            
+
+            <!-- Pagination -->
+            <div class="mt-8 flex justify-center">
+                {{ $recipes->links() }}
+            </div>
+
             <!-- Call to Action (only show for guests or unverified users) -->
             @if (!auth()->check() || !auth()->user()->hasVerifiedEmail())
             <div class="mt-12 sm:mt-16 text-center bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 sm:p-12">

@@ -20,14 +20,16 @@ class AdminMiddleware
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Please log in to access this area.');
         }
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         // Check if user is verified
-        if (!Auth::user()->hasVerifiedEmail()) {
+        if (!$user->hasVerifiedEmail()) {
             return redirect()->route('verification.notice')->with('error', 'Please verify your email first.');
         }
 
         // Check if user is admin
-        if (!Auth::user()->isAdmin()) {
+        if (!$user->isAdmin()) {
             return redirect()->route('recipes.index')->with('error', 'Access denied. Admin privileges required.');
         }
 

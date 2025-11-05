@@ -9,17 +9,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+// DomPDF facade (optional - package: barryvdh/laravel-dompdf)
 
 class RecipeController extends Controller
 {
     /**
      * Display the homepage with approved recipes.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = 9; 
+
         $recipes = Recipe::where('is_approved', true)
             ->latest()
-            ->get();
+            ->paginate($perPage)
+            ->appends($request->except('page'));
 
         return view('recipes.index', compact('recipes'));
     }
@@ -109,14 +113,33 @@ class RecipeController extends Controller
      */
     public function download(Recipe $recipe)
     {
-        // Create the content for the text file
+        // Prefer generating a PDF using barryvdh/laravel-dompdf if available.
+        // If the package is not installed or PDF creation fails, fall back to a plain text download.
+
+        $safeName = preg_replace('/[^A-Za-z0-9\-]/', '_', $recipe->recipe_name);
+        $pdfFilename = $safeName . '_recipe.pdf';
+
+        try {
+            // If the DomPDF wrapper is bound (package installed), render the PDF view
+            if (app()->bound('dompdf.wrapper')) {
+                $pdf = app('dompdf.wrapper')->loadView('recipes.pdf', compact('recipe'))
+                    ->setPaper('a4', 'portrait');
+
+                return $pdf->download($pdfFilename);
+            }
+        } catch (\Exception $e) {
+            // Log and fall back to text
+            Log::warning('PDF generation failed: ' . $e->getMessage());
+        }
+
+        // Fallback: generate a plain text file (previous behavior)
         $content = "=== {$recipe->recipe_name} ===\n\n";
         $content .= "Submitted by: {$recipe->submitter_name}\n";
         if ($recipe->prep_time) {
             $content .= "Prep Time: {$recipe->prep_time}\n";
         }
         $content .= "Date Added: " . $recipe->created_at->format('F j, Y') . "\n\n";
-        
+
         $content .= "INGREDIENTS:\n";
         $content .= str_repeat("-", 40) . "\n";
         foreach (explode("\n", $recipe->ingredients) as $ingredient) {
@@ -124,7 +147,7 @@ class RecipeController extends Controller
                 $content .= "• " . trim($ingredient) . "\n";
             }
         }
-        
+
         $content .= "\nINSTRUCTIONS:\n";
         $content .= str_repeat("-", 40) . "\n";
         foreach (explode("\n", $recipe->instructions) as $index => $instruction) {
@@ -134,17 +157,15 @@ class RecipeController extends Controller
                 $content .= "{$step}. {$cleanInstruction}\n";
             }
         }
-        
+
         $content .= "\n" . str_repeat("=", 50) . "\n";
         $content .= "Downloaded from Community Recipe Book\n";
         $content .= url('/') . "\n";
 
-        // Create filename
-        $filename = preg_replace('/[^A-Za-z0-9\-]/', '_', $recipe->recipe_name) . '_recipe.txt';
-
-        // Return download response
+        // Return text fallback
+        $txtFilename = $safeName . '_recipe.txt';
         return response($content)
             ->header('Content-Type', 'text/plain')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+            ->header('Content-Disposition', 'attachment; filename="' . $txtFilename . '"');
     }
 }

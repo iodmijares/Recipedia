@@ -32,8 +32,9 @@ class LoginController extends Controller
         $remember = $request->filled('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            /** @var \App\Models\User $user */
             $user = Auth::user();
-            
+
             // Check if email is verified
             if (!$user->hasVerifiedEmail()) {
                 Auth::logout(); // Log them out immediately
