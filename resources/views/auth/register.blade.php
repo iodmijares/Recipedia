@@ -22,7 +22,7 @@
         <!-- Registration Form -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
             <div class="p-6 sm:p-8 bg-gradient-to-b from-white to-emerald-50 dark:from-gray-800 dark:to-gray-900">
-                <form method="POST" action="{{ route('register') }}" class="space-y-6">
+                <form method="POST" action="{{ route('register') }}" class="space-y-6" enctype="multipart/form-data">
                     @csrf
                     
                     <!-- Name -->
@@ -41,9 +41,7 @@
                                autofocus
                                class="w-full px-4 py-3 rounded-lg border border-emerald-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
                                placeholder="Enter your full name">
-                        @error('name')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
+                        {{-- Error handled by flash-messages component --}}
                     </div>
 
                     <!-- Email Address -->
@@ -61,9 +59,7 @@
                                required
                                class="w-full px-4 py-3 rounded-lg border border-green-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
                                placeholder="Enter your email address">
-                        @error('email')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
+                        {{-- Error handled by flash-messages component --}}
                     </div>
 
                     <!-- Password -->
@@ -80,9 +76,7 @@
                                required
                                class="w-full px-4 py-3 rounded-lg border border-teal-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200"
                                placeholder="Choose a strong password">
-                        @error('password')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
+                        {{-- Error handled by flash-messages component --}}
                     </div>
 
                     <!-- Confirm Password -->
@@ -99,9 +93,7 @@
                                required
                                class="w-full px-4 py-3 rounded-lg border border-cyan-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200"
                                placeholder="Confirm your password">
-                        @error('password_confirmation')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
+                        {{-- Error handled by flash-messages component --}}
                     </div>
 
                     <!-- Submit Button -->

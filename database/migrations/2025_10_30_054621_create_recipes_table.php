@@ -19,17 +19,9 @@ return new class extends Migration
             $table->string('prep_time')->nullable();
             $table->text('ingredients');
             $table->text('instructions');
-            $table->string('recipe_image');
+            $table->string('recipe_images');
             $table->boolean('is_approved')->default(false);
             $table->timestamps();
         });
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('recipes');
     }
 };

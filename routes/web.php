@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 
 // Home route - redirect to recipes index
-Route::get('/', [RecipeController::class, 'index'])->name('recipes.index');
+Route::redirect('/', '/recipes')->name('home');
 
 // Authentication routes
 Route::middleware('guest')->group(function () {
@@ -17,8 +17,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+        // Password reset routes
+        Route::get('/password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+        Route::post('/password/email', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::get('/password/reset/{token}', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::post('/password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'reset'])->name('password.update');
 });
-
+            
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     
@@ -66,8 +71,22 @@ Route::post('/recipes', [RecipeController::class, 'store'])
     ->middleware(['auth', 'verified', 'throttle:10,1'])
     ->name('recipes.store');
 
+// Rating submission route
+Route::post('/recipes/{recipe}/rate', [RecipeController::class, 'rate'])->name('recipes.rate');
+Route::post('/recipes/{recipe}/rate-ajax', [RecipeController::class, 'rateAjax'])->name('recipes.rateAjax');
+
+// AJAX endpoint for recipes pagination
+Route::get('/recipes-ajax', [RecipeController::class, 'indexAjax'])->name('recipes.indexAjax');
+
+// Profile settings routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/profile/picture', [\App\Http\Controllers\ProfileController::class, 'showPicture'])->name('profile.picture');
+    Route::post('/profile/picture', [\App\Http\Controllers\ProfileController::class, 'updatePicture'])->name('profile.picture');
+});
+
 // Admin routes (protected with authentication, email verification, and admin privileges)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/recipes/{recipe}', [AdminController::class, 'show'])->name('recipe.show');
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::patch('/recipes/{recipe}/approve', [AdminController::class, 'approve'])->name('approve');
     Route::delete('/recipes/{recipe}/reject', [AdminController::class, 'reject'])->name('reject');

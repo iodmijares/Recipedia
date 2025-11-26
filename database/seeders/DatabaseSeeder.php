@@ -22,9 +22,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        // Seed recipes
+        // Seed recipes and ratings
         $this->call([
             RecipeSeeder::class,
+            RatingSeeder::class,
         ]);
     }
 }

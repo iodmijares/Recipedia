@@ -20,7 +20,7 @@ class Recipe extends Model
         'prep_time',
         'ingredients',
         'instructions',
-        'recipe_image',
+        'recipe_images',
         'is_approved',
     ];
 
@@ -31,5 +31,17 @@ class Recipe extends Model
      */
     protected $casts = [
         'is_approved' => 'boolean',
+        'recipe_images' => 'array',
     ];
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    // Relationship to the user who uploaded the recipe
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'submitter_email', 'email');
+    }
 }

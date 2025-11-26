@@ -19,11 +19,11 @@ class AdminController extends Controller
     {
         $pendingRecipes = Recipe::where('is_approved', false)
             ->latest()
-            ->get();
-            
+            ->paginate(10);
+
         $approvedRecipes = Recipe::where('is_approved', true)
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('admin.dashboard', compact('pendingRecipes', 'approvedRecipes'));
     }
@@ -42,7 +42,7 @@ class AdminController extends Controller
             Log::warning('Failed to send recipe approval email: ' . $e->getMessage());
         }
 
-        return redirect()->back()->with('toast_success', "✅ Recipe '{$recipe->recipe_name}' approved and published!");
+        return redirect()->route('admin.dashboard')->with('toast_success', "✅ Recipe '{$recipe->recipe_name}' approved and published!");
     }
 
     /**
@@ -67,7 +67,7 @@ class AdminController extends Controller
 
         $recipe->delete();
 
-        return redirect()->back()->with('toast_warning', "⚠️ Recipe '{$recipeName}' rejected and permanently deleted!");
+        return redirect()->route('admin.dashboard')->with('toast_warning', "⚠️ Recipe '{$recipeName}' rejected and permanently deleted!");
     }
 
     /**
@@ -81,5 +81,14 @@ class AdminController extends Controller
         $icon = $recipe->is_approved ? '✅' : '📝';
         
         return redirect()->back()->with('toast_info', "{$icon} Recipe '{$recipe->recipe_name}' {$status}!");
+    }
+
+    /**
+     * Show the details of a recipe for admin review.
+     */
+    public function show(Recipe $recipe)
+    {
+        $images = json_decode($recipe->recipe_images, true);
+        return view('admin.recipe.show', compact('recipe', 'images'));
     }
 }

@@ -38,20 +38,8 @@ class LoginController extends Controller
             // Check if email is verified
             if (!$user->hasVerifiedEmail()) {
                 Auth::logout(); // Log them out immediately
-                
-                // Send new OTP if needed
-                try {
-                    if ($user->canRequestNewOtp()) {
-                        $user->sendEmailVerificationOtp();
-                    }
-                    
-                    session(['verification_user_id' => $user->id]);
-                    
-                    return redirect()->route('verification.show')->with('warning', 'Please verify your email before logging in. We\'ve sent a verification code to your email.');
-                } catch (\Exception $e) {
-                    Log::error('Failed to send OTP during login: ' . $e->getMessage());
-                    return back()->withErrors(['email' => 'Please verify your email before logging in. Contact support if you need help.']);
-                }
+                session(['verification_user_id' => $user->id]);
+                return redirect()->route('verification.show')->with('warning', 'Please verify your email before logging in.');
             }
             
             $request->session()->regenerate();

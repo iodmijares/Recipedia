@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Approved Recipes')
+@section('title', 'Online Recipes')
 
 @section('content')
 <div class="py-6 sm:py-12">
@@ -26,16 +26,67 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
+        @if(session('status'))
+            <script>
+                window.addEventListener('DOMContentLoaded', function() {
+                    var statusMsg = "{{ addslashes(session('status')) }}";
+                    window.dispatchEvent(new CustomEvent('show-toast', {
+                        detail: {
+                            type: 'info',
+                            message: statusMsg
+                        }
+                    }));
+                });
+            </script>
+        @endif
+        <script>
+        function updateRatings() {
+            fetch("{{ route('recipes.indexAjax') }}", {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.recipes) {
+                    data.recipes.forEach(function(recipe) {
+                        var ratingDisplay = document.querySelector('.rating-display[data-recipe-id="' + recipe.id + '"]');
+                        if (ratingDisplay) {
+                            var stars = ratingDisplay.querySelector('.rating-stars');
+                            var value = ratingDisplay.querySelector('.rating-value');
+                            if (stars && value) {
+                                let starHtml = '';
+                                for (let i = 1; i <= 5; i++) {
+                                    starHtml += `<svg class=\"w-4 h-4 ${i <= Math.round(recipe.avg_rating) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path d=\"M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z\"/></svg>`;
+                                }
+                                stars.innerHTML = starHtml;
+                                if (recipe.rating_count > 0) {
+                                    value.innerHTML = `${recipe.avg_rating.toFixed(1)} <span class='text-gray-400'>(${recipe.rating_count})</span>`;
+                                } else {
+                                    value.innerHTML = `<span class='text-gray-400'>No ratings</span>`;
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRatings();
+            setInterval(updateRatings, 10000); // Update every 10 seconds
+        });
+        </script>
         @if($recipes->count() > 0)
             <!-- Recipe Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach($recipes as $recipe)
                     <a href="{{ route('recipes.show', $recipe) }}" class="block group">
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-700 opacity-0 translate-y-4 hover:-translate-y-2 overflow-hidden h-full flex flex-col" id="recipe-card-{{ $recipe->id }}">
                             <!-- Image Container -->
-                            <div class="relative h-64 overflow-hidden">
-                                @if($recipe->recipe_image)
-                                    <img src="{{ asset('storage/' . $recipe->recipe_image) }}" 
+                            <div class="relative h-64 overflow-hidden shrink-0">
+                                @php $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : json_decode($recipe->recipe_images, true); @endphp
+                                @if($images && count($images) > 0)
+                                    <img src="{{ asset('storage/' . $images[0]) }}" 
                                          alt="{{ $recipe->recipe_name }}" 
                                          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                 @else
@@ -61,44 +112,68 @@
                                 
                                 <!-- Recipe Title on Image -->
                                 <div class="absolute bottom-4 left-4 right-4">
-                                    <h3 class="text-xl font-bold text-white leading-tight line-clamp-2">
+                                    <h3 class="text-xl font-bold text-white leading-tight line-clamp-2 drop-shadow-md">
                                         {{ $recipe->recipe_name }}
                                     </h3>
                                 </div>
                             </div>
                             
                             <!-- Content -->
-                            <div class="p-6">
+                            <div class="p-6 flex flex-col flex-1">
                                 <!-- Submitter Info -->
-                                <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                                        <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mr-3">
-                                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                            </svg>
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center mr-2 overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600">
+                                            @php $profilePic = $recipe->user ? $recipe->user->profile_picture_url : null; @endphp
+                                            @if($profilePic)
+                                                <img src="{{ $profilePic }}" alt="{{ $recipe->user->name ?? $recipe->submitter_name }}" class="w-6 h-6 object-cover rounded-full">
+                                            @else
+                                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                            @endif
                                         </div>
-                                        <div>
-                                            <p class="font-medium text-gray-900 dark:text-white">{{ $recipe->submitter_name }}</p>
-                                            <p class="text-xs">{{ $recipe->created_at->format('M j, Y') }}</p>
-                                        </div>
+                                        <span class="font-medium text-gray-900 dark:text-white">{{ $recipe->user->name ?? $recipe->submitter_name }}</span>
                                     </div>
+                                    <p class="text-xs text-gray-500">{{ $recipe->created_at->format('M j') }}</p>
+                                </div>
+
+                                <!-- Rating Stars -->
+                                @php 
+                                    $avgRating = $recipe->ratings->avg('rating'); 
+                                    $ratingCount = $recipe->ratings->count();
+                                @endphp
+                                <div class="flex items-center mb-3" title="Average Rating: {{ number_format($avgRating, 1) }}">
+                                    <div class="flex items-center">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <svg class="w-4 h-4 {{ $i <= round($avgRating) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        @endfor
+                                    </div>
+                                    <span class="ml-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+                                        @if($ratingCount > 0)
+                                            {{ number_format($avgRating, 1) }} <span class="text-gray-400">({{ $ratingCount }})</span>
+                                        @else
+                                            <span class="text-gray-400">No ratings</span>
+                                        @endif
+                                    </span>
                                 </div>
 
                                 <!-- Quick Preview -->
-                                <div class="space-y-3">
+                                <div class="mb-4 flex-1">
                                     <div class="flex items-start">
-                                        <div class="w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                                            {{ Str::limit(collect(explode("\n", $recipe->ingredients))->filter()->first(), 60) }}...
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
+                                            {{ Str::limit(collect(explode("\n", $recipe->ingredients))->filter()->first() . '...', 80) }}
                                         </p>
                                     </div>
                                 </div>
 
                                 <!-- View Recipe Button -->
-                                <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
-                                    <span class="inline-flex items-center text-blue-600 dark:text-blue-400 font-medium group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
+                                <div class="pt-4 border-t border-gray-100 dark:border-gray-700 mt-auto">
+                                    <span class="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 font-medium group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
                                         View Full Recipe
-                                        <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                                         </svg>
                                     </span>
@@ -149,17 +224,28 @@
                     <p class="text-gray-600 dark:text-gray-400 mb-8 text-sm sm:text-base">
                         Be the first to share your favorite recipe with the community! Help us build an amazing collection of delicious dishes.
                     </p>
-                   <a href="{{ route('recipes.create') }}" 
-                   class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200">
-                       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                       </svg>
-                       Submit Recipe
-                   </a>
-                
+                    <a href="{{ route('recipes.create') }}" 
+                    class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Submit Recipe
+                    </a>
                 </div>
             </div>
         @endif
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('[id^="recipe-card-"]');
+    cards.forEach((card, i) => {
+        setTimeout(() => {
+            card.classList.remove('opacity-0', 'translate-y-4');
+            card.classList.add('opacity-100', 'translate-y-0');
+        }, 100 + i * 120); // Staggered fade-in
+    });
+});
+</script>
 @endsection

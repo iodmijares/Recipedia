@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use App\Notifications\EmailVerificationOtp;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -28,6 +28,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verification_otp',
         'otp_expires_at',
         'otp_attempts',
+        'profile_picture',
     ];
 
     /**
@@ -179,5 +180,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function hasAdminAccess()
     {
         return in_array($this->role, ['admin', 'moderator']);
+    }
+    /**
+     * Get the full URL for the profile picture or null if not set.
+     */
+        public function getProfilePictureUrlAttribute()
+    {
+            if ($this->profile_picture) {
+                return Storage::url($this->profile_picture);
+        }
+        return null;
     }
 }

@@ -29,14 +29,17 @@
             <div class="p-6 sm:p-8 bg-gradient-to-b from-white to-amber-50 dark:from-gray-800 dark:to-gray-900">
                 
                 @if (session('status'))
-                    <div class="mb-6 bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800 rounded-lg p-4">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 text-emerald-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <p class="text-sm text-emerald-700 dark:text-emerald-300">{{ session('status') }}</p>
-                        </div>
-                    </div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', function() {
+                            var statusMsg = "{{ addslashes(session('status')) }}";
+                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                detail: {
+                                    type: 'success',
+                                    message: statusMsg
+                                }
+                            }));
+                        });
+                    </script>
                 @endif
 
                 <div class="text-center mb-8">

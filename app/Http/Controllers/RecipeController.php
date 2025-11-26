@@ -14,6 +14,77 @@ use Illuminate\Support\Facades\Storage;
 class RecipeController extends Controller
 {
     /**
+     * Handle AJAX rating submission for a recipe.
+     */
+    public function rateAjax(Request $request, Recipe $recipe)
+    {
+        if (!$request->ajax()) {
+            return response()->json(['error' => 'Invalid request'], 400);
+        }
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
+
+        $user = \Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'You must be logged in to rate recipes.'], 401);
+        }
+
+        $existing = $recipe->ratings()->where('user_id', $user->id)->first();
+        if ($existing) {
+            $existing->update(['rating' => $validated['rating']]);
+            $msg = 'Your rating has been updated!';
+        } else {
+            $recipe->ratings()->create([
+                'user_id' => $user->id,
+                'rating' => $validated['rating'],
+            ]);
+            $msg = 'Thank you for rating this recipe!';
+        }
+
+        $averageRating = $recipe->ratings()->avg('rating');
+        $ratingsCount = $recipe->ratings()->count();
+        $userRating = $recipe->ratings()->where('user_id', $user->id)->first()->rating;
+
+        return response()->json([
+            'message' => $msg,
+            'averageRating' => number_format($averageRating, 1),
+            'ratingsCount' => $ratingsCount,
+            'userRating' => $userRating,
+        ]);
+    }
+    /**
+     * Handle rating submission for a recipe.
+     */
+    public function rate(Request $request, Recipe $recipe)
+    {
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+        ]);
+
+        $user = \Auth::user();
+        if (!$user) {
+            return redirect()->route('recipes.show', $recipe)
+                ->with('rating_status', 'You must be logged in to rate recipes.');
+        }
+
+        // Find existing rating for this user and recipe
+        $existing = $recipe->ratings()->where('user_id', $user->id)->first();
+        if ($existing) {
+            $existing->update(['rating' => $validated['rating']]);
+            $msg = 'Your rating has been updated!';
+        } else {
+            $recipe->ratings()->create([
+                'user_id' => $user->id,
+                'rating' => $validated['rating'],
+            ]);
+            $msg = 'Thank you for rating this recipe!';
+        }
+
+        return redirect()->route('recipes.show', $recipe)
+            ->with('rating_status', $msg);
+    }
+    /**
      * Display the homepage with approved recipes.
      */
     public function index(Request $request)
@@ -38,7 +109,10 @@ class RecipeController extends Controller
             abort(404);
         }
 
-        return view('recipes.show', compact('recipe'));
+        $averageRating = $recipe->ratings()->avg('rating');
+        $ratingsCount = $recipe->ratings()->count();
+
+        return view('recipes.show', compact('recipe', 'averageRating', 'ratingsCount'));
     }
 
     /**
@@ -57,27 +131,57 @@ class RecipeController extends Controller
         // Validate the incoming request
         $validated = $request->validate([
             'recipe_name' => 'required|string|max:255',
-            'submitter_name' => 'required|string|max:255',
-            'submitter_email' => 'required|email',
-            'prep_time' => 'nullable|string',
+            'prep_time_hours' => 'nullable|integer|min:0',
+            'prep_time_minutes' => 'nullable|integer|min:0|max:59',
             'ingredients' => 'required|string',
             'instructions' => 'required|string',
-            'recipe_image' => 'required|image|max:2048',
+            'recipe_images' => 'required|array|max:4',
+            'recipe_images.*' => 'image|max:2048',
+        ], [
+            'recipe_images.max' => 'You can only upload a maximum of 4 images.',
         ]);
 
+        // Combine prep time
+        $prepTime = '';
+        if (!empty($validated['prep_time_hours']) || !empty($validated['prep_time_minutes'])) {
+            $hours = (int) ($validated['prep_time_hours'] ?? 0);
+            $minutes = (int) ($validated['prep_time_minutes'] ?? 0);
+            $parts = [];
+            if ($hours > 0) {
+                $parts[] = $hours . ' hour' . ($hours > 1 ? 's' : '');
+            }
+            if ($minutes > 0) {
+                $parts[] = $minutes . ' minute' . ($minutes > 1 ? 's' : '');
+            }
+            $prepTime = implode(' ', $parts);
+        }
+
+        // Get the authenticated user
+        $user = auth()->user();
+
         try {
-            // Handle file upload
-            $imagePath = $request->file('recipe_image')->store('uploads', 'public');
+            // Handle multiple file uploads
+            $imagePaths = [];
+            if ($request->hasFile('recipe_images')) {
+                foreach ($request->file('recipe_images') as $image) {
+                    $imagePaths[] = $image->store('uploads', 'public');
+                }
+            }
 
             // Create new recipe record
             $recipe = new Recipe();
             $recipe->recipe_name = $validated['recipe_name'];
-            $recipe->submitter_name = $validated['submitter_name'];
-            $recipe->submitter_email = $validated['submitter_email'];
-            $recipe->prep_time = $validated['prep_time'];
+            if ($user) {
+                $recipe->submitter_name = $user->name;
+                $recipe->submitter_email = $user->email;
+            } else {
+                $recipe->submitter_name = 'Anonymous';
+                $recipe->submitter_email = null;
+            }
+            $recipe->prep_time = $prepTime;
             $recipe->ingredients = $validated['ingredients'];
             $recipe->instructions = $validated['instructions'];
-            $recipe->recipe_image = $imagePath;
+            $recipe->recipe_images = json_encode($imagePaths);
             $recipe->is_approved = false; // Default to false
             $recipe->save();
 
@@ -96,15 +200,15 @@ class RecipeController extends Controller
                 // Continue with success response even if email fails
             }
 
-            // Redirect with success message
-            return redirect('/')->with('success', "Thank you! Your recipe '{$recipe->recipe_name}' has been submitted for review.");
+            // Redirect with success message (global toast)
+            return redirect('/')->with('toast_success', "Thank you! Your recipe '{$recipe->recipe_name}' has been submitted for review.");
 
         } catch (\Exception $e) {
             // Log the error
             Log::error('Recipe submission failed: ' . $e->getMessage());
 
-            // Redirect back with error message
-            return back()->with('error', 'An error occurred while submitting your recipe. Please try again.');
+            // Redirect back with error message (global toast)
+            return back()->with('toast_error', 'An error occurred while submitting your recipe. Please try again.');
         }
     }
 
@@ -167,5 +271,26 @@ class RecipeController extends Controller
         return response($content)
             ->header('Content-Type', 'text/plain')
             ->header('Content-Disposition', 'attachment; filename="' . $txtFilename . '"');
+    }
+
+    /**
+     * AJAX endpoint for paginated recipes (browse).
+     */
+    public function indexAjax(Request $request)
+    {
+        $perPage = 9;
+        $recipes = Recipe::where('is_approved', true)
+            ->latest()
+            ->paginate($perPage)
+            ->appends($request->except('page'));
+        // Return only the data needed for AJAX rendering
+        return response()->json([
+            'recipes' => $recipes->items(),
+            'pagination' => [
+                'current_page' => $recipes->currentPage(),
+                'last_page' => $recipes->lastPage(),
+                'total' => $recipes->total(),
+            ],
+        ]);
     }
 }

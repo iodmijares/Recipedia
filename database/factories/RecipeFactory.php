@@ -116,7 +116,7 @@ class RecipeFactory extends Factory
             'prep_time' => $recipe['prep_time'],
             'ingredients' => $recipe['ingredients'],
             'instructions' => $recipe['instructions'],
-            'recipe_image' => $this->faker->randomElement($images),
+            'recipe_images' => $this->faker->randomElement($images),
             'is_approved' => $this->faker->boolean(80), // 80% chance of being approved
         ];
     }

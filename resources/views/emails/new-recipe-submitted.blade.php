@@ -4,83 +4,90 @@
     <title>New Recipe Submitted</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.8;
             color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
         }
-        .recipe-details {
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 20px;
-        }
-        .field {
-            margin-bottom: 15px;
-        }
-        .field-label {
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
             font-weight: bold;
-            color: #495057;
         }
-        .field-value {
-            margin-top: 5px;
+        .header .emoji {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .recipe-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+            border: 2px solid #10b981;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .recipe-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+        .recipe-info {
+            color: #047857;
+            font-size: 16px;
+        }
+        .message-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin-top: 20px;
+            color: #065f46;
+            font-size: 15px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <span class="emoji">🥗</span>
             <h1>New Recipe Submitted</h1>
             <p>A new recipe has been submitted to the Community Recipe Book and is awaiting approval.</p>
         </div>
-
-        <div class="recipe-details">
-            <div class="field">
-                <div class="field-label">Recipe Name:</div>
-                <div class="field-value">{{ $recipe->recipe_name }}</div>
-            </div>
-
-            <div class="field">
-                <div class="field-label">Submitted By:</div>
-                <div class="field-value">{{ $recipe->submitter_name }} ({{ $recipe->submitter_email }})</div>
-            </div>
-
-            @if($recipe->prep_time)
-            <div class="field">
-                <div class="field-label">Prep Time:</div>
-                <div class="field-value">{{ $recipe->prep_time }}</div>
-            </div>
-            @endif
-
-            <div class="field">
-                <div class="field-label">Ingredients:</div>
-                <div class="field-value">{{ $recipe->ingredients }}</div>
-            </div>
-
-            <div class="field">
-                <div class="field-label">Instructions:</div>
-                <div class="field-value">{{ $recipe->instructions }}</div>
-            </div>
-
-            <div class="field">
-                <div class="field-label">Submitted On:</div>
-                <div class="field-value">{{ $recipe->created_at->format('F j, Y \a\t g:i A') }}</div>
+        <div class="content">
+            <div class="recipe-card">
+                <div class="recipe-name">{{ $recipe->recipe_name }}</div>
+                <div class="recipe-info"><strong>Submitted By:</strong> {{ $recipe->submitter_name }} ({{ $recipe->submitter_email }})</div>
+                @if($recipe->prep_time)
+                <div class="recipe-info"><strong>Prep Time:</strong> {{ $recipe->prep_time }}</div>
+                @endif
+                <div class="recipe-info"><strong>Ingredients:</strong> {{ $recipe->ingredients }}</div>
+                <div class="recipe-info"><strong>Instructions:</strong> {{ $recipe->instructions }}</div>
+                <div class="recipe-info"><strong>Submitted On:</strong> {{ $recipe->created_at->format('F j, Y \a\t g:i A') }}</div>
             </div>
         </div>
-
-        <p style="margin-top: 20px; color: #6c757d; font-size: 14px;">
-            Please review this recipe and approve it if it meets your guidelines.
-        </p>
+        <div class="message-box">
+            Please review this recipe and approve it if it meets your guidelines.<br>
+            Thank you for helping keep our community delicious!
+        </div>
     </div>
 </body>
 </html>

@@ -81,6 +81,46 @@
                 <form action="{{ route('recipes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     
+                    <!-- Error Toasts Above Form -->
+                    @if ($errors->any())
+                        <script>
+                            window.addEventListener('DOMContentLoaded', function() {
+                                var errors = @json($errors->all());
+                                errors.forEach(function(error) {
+                                    window.dispatchEvent(new CustomEvent('show-toast', {
+                                        detail: {
+                                            type: 'error',
+                                            message: error
+                                        }
+                                    }));
+                                });
+                            });
+                        </script>
+                    @endif
+                    @if (session('error'))
+                        <script>
+                            window.addEventListener('DOMContentLoaded', function() {
+                                window.dispatchEvent(new CustomEvent('show-toast', {
+                                    detail: {
+                                        type: 'error',
+                                        message: @json(session('error'))
+                                    }
+                                }));
+                            });
+                        </script>
+                    @endif
+                    @if (session('success'))
+                        <script>
+                            window.addEventListener('DOMContentLoaded', function() {
+                                window.dispatchEvent(new CustomEvent('show-toast', {
+                                    detail: {
+                                        type: 'success',
+                                        message: @json(session('success'))
+                                    }
+                                }));
+                            });
+                        </script>
+                    @endif
                     <!-- Recipe Name -->
                     <div>
                         <label for="recipe_name" class="block text-sm font-semibold text-orange-700 dark:text-orange-300 mb-2 flex items-center">
@@ -96,9 +136,6 @@
                                required
                                class="w-full px-4 py-3 rounded-lg border border-orange-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
                                placeholder="Enter your recipe name">
-                        @error('recipe_name')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Submitter Details -->
@@ -113,13 +150,11 @@
                             <input type="text" 
                                    id="submitter_name" 
                                    name="submitter_name" 
-                                   value="{{ old('submitter_name') }}"
+                                   value="{{ auth()->user()->name ?? '' }}"
                                    required
-                                   class="w-full px-4 py-3 rounded-lg border border-red-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
+                                   readonly
+                                   class="w-full px-4 py-3 rounded-lg border border-red-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-not-allowed"
                                    placeholder="Enter your name">
-                            @error('submitter_name')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -132,33 +167,30 @@
                             <input type="email" 
                                    id="submitter_email" 
                                    name="submitter_email" 
-                                   value="{{ old('submitter_email') }}"
+                                   value="{{ auth()->user()->email ?? '' }}"
                                    required
-                                   class="w-full px-4 py-3 rounded-lg border border-pink-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200"
+                                   readonly
+                                   class="w-full px-4 py-3 rounded-lg border border-pink-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 cursor-not-allowed"
                                    placeholder="Enter your email address">
-                            @error('submitter_email')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
                     <!-- Prep Time -->
                     <div>
-                        <label for="prep_time" class="block text-sm font-semibold text-amber-700 dark:text-amber-300 mb-2 flex items-center">
+                        <label class="block text-sm font-semibold text-amber-700 dark:text-amber-300 mb-2 flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             Preparation Time
                         </label>
-                        <input type="text" 
-                               id="prep_time" 
-                               name="prep_time" 
-                               value="{{ old('prep_time') }}"
-                               placeholder="e.g., 30 minutes, 1 hour 15 minutes"
-                               class="w-full px-4 py-3 rounded-lg border border-amber-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200">
-                        @error('prep_time')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <input type="number" min="0" id="prep_time_hours" name="prep_time_hours" value="{{ old('prep_time_hours') }}" placeholder="Hours" class="w-full px-4 py-3 rounded-lg border border-amber-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200">
+                            </div>
+                            <div class="flex-1">
+                                <input type="number" min="0" max="59" id="prep_time_minutes" name="prep_time_minutes" value="{{ old('prep_time_minutes') }}" placeholder="Minutes" class="w-full px-4 py-3 rounded-lg border border-amber-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Ingredients -->
@@ -175,9 +207,6 @@
                                   rows="6"
                                   placeholder="List all ingredients with quantities, one per line"
                                   class="w-full px-4 py-3 rounded-lg border border-emerald-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200 resize-vertical">{{ old('ingredients') }}</textarea>
-                        @error('ingredients')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Instructions -->
@@ -194,18 +223,15 @@
                                   rows="8"
                                   placeholder="Step-by-step cooking instructions"
                                   class="w-full px-4 py-3 rounded-lg border border-blue-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-vertical">{{ old('instructions') }}</textarea>
-                        @error('instructions')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Recipe Image Upload -->
                     <div>
-                        <label for="recipe_image" class="block text-sm font-semibold text-purple-700 dark:text-purple-300 mb-2 flex items-center">
+                        <label for="recipe_images" class="block text-sm font-semibold text-purple-700 dark:text-purple-300 mb-2 flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
-                            Recipe Image *
+                            Recipe Images * (you can upload multiple)
                         </label>
                         <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-purple-200 dark:border-gray-600 border-dashed rounded-lg hover:border-purple-300 dark:hover:border-gray-500 transition-colors duration-200 bg-purple-50 dark:bg-gray-700">
                             <div class="space-y-1 text-center">
@@ -213,20 +239,44 @@
                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                                 <div class="flex text-sm text-gray-600 dark:text-gray-400">
-                                    <label for="recipe_image" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-purple-600 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500 px-2 py-1">
-                                        <span>Upload a file</span>
-                                        <input id="recipe_image" name="recipe_image" type="file" accept="image/*" class="sr-only" required>
+                                    <label for="recipe_images" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-purple-600 dark:text-purple-400 hover:text-purple-500 dark:hover:text-purple-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-purple-500 px-2 py-1">
+                                        <span>Upload files</span>
+                                        <input id="recipe_images" name="recipe_images[]" type="file" accept="image/*" class="sr-only" multiple required onchange="showImagePreview(event)">
                                     </label>
                                     <p class="pl-1">or drag and drop</p>
                                 </div>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    PNG, JPG, GIF up to 2MB
+                                    PNG, JPG, GIF up to 2MB each
                                 </p>
+                                <div id="image-preview" class="mt-4 flex flex-wrap gap-3 justify-center"></div>
+                                <script>
+                                    function showImagePreview(event) {
+                                        var preview = document.getElementById('image-preview');
+                                        preview.innerHTML = '';
+                                        var files = event.target.files;
+                                        if (files.length > 4) {
+                                            alert('You can only upload a maximum of 4 images.');
+                                            event.target.value = '';
+                                            return;
+                                        }
+                                        if (files.length > 0) {
+                                            Array.from(files).forEach(function(file) {
+                                                if (file.type.startsWith('image/')) {
+                                                    var reader = new FileReader();
+                                                    reader.onload = function(e) {
+                                                        var img = document.createElement('img');
+                                                        img.src = e.target.result;
+                                                        img.className = 'h-20 w-20 object-cover rounded-lg border border-purple-300 shadow';
+                                                        preview.appendChild(img);
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            });
+                                        }
+                                    }
+                                </script>
                             </div>
                         </div>
-                        @error('recipe_image')
-                            <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <!-- Submit Buttons -->
@@ -264,8 +314,8 @@
                             <li>You'll receive an email confirmation when your recipe is submitted</li>
                         </ul>
                     </div>
-                </form>
             </div>
+        </div>
         @endif
     @endauth
 </div>

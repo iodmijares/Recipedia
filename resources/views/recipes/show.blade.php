@@ -5,75 +5,103 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Back Button -->
+        
+        @if(session('status'))
+            <script>
+                window.addEventListener('DOMContentLoaded', function() {
+                    window.dispatchEvent(new CustomEvent('show-toast', {
+                        detail: {
+                            type: 'info',
+                            message: "{{ addslashes(session('status')) }}"
+                        }
+                    }));
+                });
+            </script>
+        @endif
+
         <div class="mb-6">
-            <a href="{{ route('recipes.index') }}" 
-               class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors duration-200">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                Back to Recipes
-            </a>
+            <div class="flex gap-4 flex-wrap">
+                <a href="{{ route('recipes.index') }}" 
+                   class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-medium rounded-lg transition-colors duration-200 shadow-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to Recipes
+                </a>
+            </div>
         </div>
 
-        <!-- Recipe Card -->
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
-            <!-- Recipe Image -->
-            <div class="relative h-96 bg-gradient-to-r from-blue-500 to-purple-600">
-                @if($recipe->recipe_image && file_exists(public_path('storage/' . $recipe->recipe_image)))
-                    <img src="{{ asset('storage/' . $recipe->recipe_image) }}" 
+            
+            <!-- Image Gallery / Hero Section -->
+            <div class="relative h-64 md:h-80 bg-gray-200 dark:bg-gray-700 group">
+                @php $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : json_decode($recipe->recipe_images, true); @endphp
+                @if($images && count($images) > 0)
+                    <img src="{{ asset('storage/' . $images[0]) }}" 
                          alt="{{ $recipe->recipe_name }}"
                          class="w-full h-full object-cover">
                 @else
-                    <div class="flex items-center justify-center h-full">
-                        <div class="text-center text-white">
-                            <svg class="h-24 w-24 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    <div class="flex items-center justify-center h-full bg-gradient-to-r from-blue-500 to-purple-600">
+                        <div class="text-center text-white p-6">
+                            <svg class="h-20 w-20 mx-auto mb-4 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
-                            <p class="text-lg font-medium">{{ $recipe->recipe_name }}</p>
                         </div>
                     </div>
                 @endif
                 
-                <!-- Recipe Title Overlay -->
-                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                    <h1 class="text-3xl sm:text-4xl font-bold text-white mb-2">{{ $recipe->recipe_name }}</h1>
-                    <div class="flex items-center text-white/90 text-sm">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <span>By {{ $recipe->submitter_name }}</span>
-                        @if($recipe->prep_time)
-                            <span class="mx-2">•</span>
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10 pointer-events-none"></div>
+                
+                <!-- Text Overlay -->
+                <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8 text-white z-10 pointer-events-none">
+                    <h1 class="text-3xl md:text-4xl font-bold mb-2 shadow-sm drop-shadow-lg">{{ $recipe->recipe_name }}</h1>
+                    <div class="flex flex-wrap items-center gap-4 text-sm md:text-base text-white/90">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
-                            <span>{{ $recipe->prep_time }}</span>
+                            {{ $recipe->submitter_name }}
+                        </div>
+                        @if($recipe->prep_time)
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                {{ $recipe->prep_time }}
+                            </div>
                         @endif
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <span id="header-rating-value">{{ $averageRating ? number_format($averageRating, 1) : 'New' }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recipe Content -->
-            <div class="p-6 sm:p-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Ingredients -->
+            <div class="p-6 md:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    
                     <div>
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-6 h-6 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                            </svg>
+                            <span class="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg mr-3">
+                                <svg class="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                            </span>
                             Ingredients
                         </h2>
-                        <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-6">
-                            <ul class="space-y-2">
+                        <div class="bg-gray-50 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
+                            <ul class="space-y-3">
                                 @foreach(explode("\n", $recipe->ingredients) as $ingredient)
                                     @if(trim($ingredient))
                                         <li class="flex items-start text-gray-700 dark:text-gray-300">
-                                            <svg class="w-2 h-2 mt-2 mr-3 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 8 8">
-                                                <circle cx="4" cy="4" r="4"/>
+                                            <svg class="w-5 h-5 mt-0.5 mr-3 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                             </svg>
-                                            <span>{{ trim($ingredient) }}</span>
+                                            <span class="leading-relaxed">{{ trim($ingredient) }}</span>
                                         </li>
                                     @endif
                                 @endforeach
@@ -81,23 +109,26 @@
                         </div>
                     </div>
 
-                    <!-- Instructions -->
                     <div>
                         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
-                            <svg class="w-6 h-6 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
+                            <span class="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg mr-3">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </span>
                             Instructions
                         </h2>
-                        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6">
-                            <ol class="space-y-4">
+                        <div class="bg-gray-50 dark:bg-gray-700/30 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
+                            <ol class="space-y-6">
                                 @foreach(explode("\n", $recipe->instructions) as $index => $instruction)
                                     @if(trim($instruction))
-                                        <li class="flex items-start text-gray-700 dark:text-gray-300">
-                                            <span class="inline-flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full text-sm font-medium mr-3 flex-shrink-0">
+                                        <li class="flex gap-4 text-gray-700 dark:text-gray-300">
+                                            <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 font-bold rounded-full text-sm">
                                                 {{ $index + 1 }}
                                             </span>
-                                            <span class="leading-relaxed">{{ trim(preg_replace('/^\d+\.\s*/', '', $instruction)) }}</span>
+                                            <div class="flex-1 pt-1 leading-relaxed">
+                                                {{ trim(preg_replace('/^\d+\.\s*/', '', $instruction)) }}
+                                            </div>
                                         </li>
                                     @endif
                                 @endforeach
@@ -106,53 +137,284 @@
                     </div>
                 </div>
 
-                <!-- Additional Info -->
-                <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <div class="flex flex-wrap items-center justify-between gap-4">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                            <p>Recipe submitted by <span class="font-medium text-gray-700 dark:text-gray-300">{{ $recipe->submitter_name }}</span></p>
-                            <p>Added on {{ $recipe->created_at->format('F j, Y') }}</p>
-                        </div>
+                <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                         
-                        <!-- Action Buttons -->
-                        <div class="flex space-x-3">
-                            <a href="{{ route('recipes.download', $recipe) }}" 
-                               class="inline-flex items-center px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors duration-200">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                 </svg>
-                                Download Recipe
-                            </a>
+                                Ratings & Reviews
+                            </h3>
                             
-                            <button onclick="shareRecipe()" 
-                                    class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
-                                </svg>
-                                Share
-                            </button>
+                            <div class="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/30 rounded-2xl p-6">
+                                <div class="flex items-end gap-3 mb-4">
+                                    <span id="avg-rating-value" class="text-4xl font-extrabold text-gray-900 dark:text-white">
+                                        {{ $averageRating ? number_format($averageRating, 1) : '0.0' }}
+                                    </span>
+                                    <div class="mb-1.5">
+                                        <div class="flex text-yellow-400 text-lg">
+                                            @for($i = 1; $i <= 5; $i++)
+                                                <span class="avg-star-display">
+                                                    @if($averageRating >= $i) ★ @else <span class="text-gray-300 dark:text-gray-600">★</span> @endif
+                                                </span>
+                                            @endfor
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+                                            Based on <span id="rating-count">{{ $ratingsCount }}</span> reviews
+                                        </p>
+                                    </div>
+                                </div>
+
+                                @auth
+                                    <div class="pt-4 border-t border-yellow-200 dark:border-yellow-800/30">
+                                        @php
+                                            $userRating = $recipe->ratings()->where('user_id', auth()->id())->first();
+                                            $currentRating = $userRating ? $userRating->rating : 0;
+                                        @endphp
+                                        
+                                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                                            {{ $userRating ? 'Update your rating:' : 'Rate this recipe:' }}
+                                        </p>
+
+                                        <form id="rating-form" action="{{ route('recipes.rateAjax', $recipe) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="rating" id="rating-input" value="{{ $currentRating }}">
+                                            
+                                            <div class="flex flex-wrap items-center gap-4">
+                                                <div class="flex gap-1" id="star-container">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <button type="button" 
+                                                                class="star-btn p-1 focus:outline-none focus:ring-2 focus:ring-yellow-400 rounded-full transition-transform hover:scale-110" 
+                                                                data-value="{{ $i }}"
+                                                                aria-label="Rate {{ $i }} stars">
+                                                            <svg class="w-8 h-8 transition-colors duration-200 {{ $currentRating >= $i ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600' }}" 
+                                                                 fill="currentColor" viewBox="0 0 20 20">
+                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                            </svg>
+                                                        </button>
+                                                    @endfor
+                                                </div>
+                                                
+                                                <button type="submit" 
+                                                        id="submit-rating-btn"
+                                                        class="px-4 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold rounded-lg shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                    {{ $userRating ? 'Update' : 'Submit' }}
+                                                </button>
+                                            </div>
+                                            <div id="user-rating-feedback" class="mt-2 text-xs font-medium text-emerald-600 h-4">
+                                                @if($userRating) You rated this {{ $currentRating }} stars. @endif
+                                            </div>
+                                        </form>
+                                    </div>
+                                @else
+                                    <div class="pt-4 border-t border-yellow-200 dark:border-yellow-800/30">
+                                        <a href="{{ route('login') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 flex items-center">
+                                            Log in to rate this recipe
+                                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                        </a>
+                                    </div>
+                                @endauth
+                            </div>
                         </div>
+
+                        <!-- Improved Download Section -->
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Recipe Tools
+                            </h3>
+                            <div class="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-6 h-full">
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                                    Love this recipe? Download it as a PDF to save it to your device or print it out for your kitchen.
+                                </p>
+                                <a href="{{ route('recipes.download', $recipe) }}" 
+                                   class="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 w-full">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Download PDF
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            
+                            /**
+                             * Local AJAX Helper
+                             */
+                            function ajax(options) {
+                                const defaults = {
+                                    method: 'GET',
+                                    headers: {},
+                                    success: () => {},
+                                    error: () => {},
+                                    complete: () => {},
+                                    responseType: 'text'
+                                };
+                                
+                                const config = { ...defaults, ...options };
+
+                                fetch(config.url, {
+                                    method: config.method,
+                                    headers: config.headers,
+                                    body: config.data
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        return response.json().then(err => { throw { message: err.message || 'Error' } });
+                                    }
+                                    return config.responseType === 'json' ? response.json() : response.text();
+                                })
+                                .then(data => config.success(data))
+                                .catch(err => config.error(err))
+                                .finally(() => config.complete());
+                            }
+
+                            // --- Star Logic (Visual) ---
+                            const starContainer = document.getElementById('star-container');
+                            if (!starContainer) return;
+
+                            const stars = starContainer.querySelectorAll('.star-btn');
+                            const ratingInput = document.getElementById('rating-input');
+                            const feedback = document.getElementById('user-rating-feedback');
+                            const form = document.getElementById('rating-form');
+            
+                            let currentRating = parseInt(ratingInput.value) || 0;
+                            let hoverRating = 0;
+
+                            function updateStarVisuals(rating) {
+                                stars.forEach(btn => {
+                                    const starVal = parseInt(btn.dataset.value);
+                                    const svg = btn.querySelector('svg');
+                                    if (rating >= starVal) {
+                                        svg.classList.remove('text-gray-300', 'dark:text-gray-600');
+                                        svg.classList.add('text-yellow-400');
+                                    } else {
+                                        svg.classList.add('text-gray-300', 'dark:text-gray-600');
+                                        svg.classList.remove('text-yellow-400');
+                                    }
+                                });
+                            }
+
+                            // Initialize
+                            updateStarVisuals(currentRating);
+
+                            // Hover Effects
+                            stars.forEach(star => {
+                                star.addEventListener('mouseenter', () => {
+                                    hoverRating = parseInt(star.dataset.value);
+                                    updateStarVisuals(hoverRating);
+                                });
+                            });
+
+                            starContainer.addEventListener('mouseleave', () => {
+                                hoverRating = 0;
+                                updateStarVisuals(currentRating);
+                            });
+
+                            // Click/Selection Logic
+                            stars.forEach(star => {
+                                star.addEventListener('click', () => {
+                                    currentRating = parseInt(star.dataset.value);
+                                    ratingInput.value = currentRating;
+                                    updateStarVisuals(currentRating);
+                                    
+                                    // Little animation pop
+                                    star.style.transform = 'scale(1.2)';
+                                    setTimeout(() => star.style.transform = 'scale(1)', 150);
+                                });
+                            });
+
+                            // --- AJAX Submission Logic ---
+                            form.addEventListener('submit', function(e) {
+                                e.preventDefault();
+
+                                if (currentRating === 0) {
+                                    window.dispatchEvent(new CustomEvent('show-toast', {
+                                        detail: { type: 'error', message: 'Please select a star rating first.' }
+                                    }));
+                                    return;
+                                }
+
+                                const submitBtn = document.getElementById('submit-rating-btn');
+                                const originalBtnText = submitBtn.innerText;
+                                
+                                // UI Loading State
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = `<span class='spinner-border spinner-border-sm text-success align-middle mr-2' role='status' aria-hidden='true'></span> <span class='align-middle'>loading...</span>`;
+
+                                const formData = new FormData(form);
+
+                                // Using the local ajax helper defined above
+                                ajax({
+                                    url: form.action,
+                                    method: 'POST',
+                                    data: formData,
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'Accept': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                                    },
+                                    responseType: 'json',
+                                    success: function(data) {
+                                        if (data.error) {
+                                            window.dispatchEvent(new CustomEvent('show-toast', {
+                                                detail: { type: 'error', message: data.error }
+                                            }));
+                                            return;
+                                        }
+
+                                        // Update Global Average Text
+                                        document.getElementById('avg-rating-value').textContent = parseFloat(data.averageRating).toFixed(1);
+                                        document.getElementById('header-rating-value').textContent = parseFloat(data.averageRating).toFixed(1);
+                                        document.getElementById('rating-count').textContent = data.ratingsCount;
+                                        
+                                        // Update User Feedback Text
+                                        feedback.textContent = `You rated this ${data.userRating} stars.`;
+                                        
+                                        // Update Global Average Stars Visuals
+                                        const avgStarsContainer = document.querySelectorAll('.avg-star-display');
+                                        const newAvg = parseFloat(data.averageRating);
+                                        avgStarsContainer.forEach((starSpan, index) => {
+                                            const starValue = index + 1;
+                                            starSpan.innerHTML = newAvg >= starValue 
+                                                ? '★' 
+                                                : '<span class="text-gray-300 dark:text-gray-600">★</span>';
+                                        });
+
+                                        // Success Toast
+                                        window.dispatchEvent(new CustomEvent('show-toast', {
+                                            detail: { type: 'success', message: data.message || 'Rating submitted successfully!' }
+                                        }));
+                                        
+                                        submitBtn.innerText = 'Update';
+                                    },
+                                    error: function(error) {
+                                        console.error('Error:', error);
+                                        window.dispatchEvent(new CustomEvent('show-toast', {
+                                            detail: { type: 'error', message: error.message || 'Failed to submit rating.' }
+                                        }));
+                                    },
+                                    complete: function() {
+                                        submitBtn.disabled = false;
+                                        if(submitBtn.innerHTML.includes('spinner-border')) {
+                                            submitBtn.innerText = originalBtnText;
+                                        }
+                                    }
+                                });
+                            });
+                        });
+                    </script>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-function shareRecipe() {
-    if (navigator.share) {
-        navigator.share({
-            title: '{{ $recipe->recipe_name }}',
-            text: 'Check out this delicious recipe: {{ $recipe->recipe_name }}',
-            url: window.location.href
-        });
-    } else {
-        // Fallback - copy URL to clipboard
-        navigator.clipboard.writeText(window.location.href).then(function() {
-            alert('Recipe URL copied to clipboard!');
-        });
-    }
-}
-</script>
 @endsection
