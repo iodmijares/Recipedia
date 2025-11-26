@@ -8,9 +8,20 @@ COPY resources/css resources/css
 RUN npm ci --silent
 RUN npm run build
 
-# Stage 2: Install PHP dependencies with Composer
-FROM composer:2 AS composer_builder
+# Stage 2: Install PHP dependencies with Composer using PHP 8.4 (compatible with lockfile)
+FROM php:8.4-cli AS composer_builder
 WORKDIR /app
+# Install system packages needed for Composer and PHP extensions
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl unzip zip libzip-dev libonig-dev ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install php extensions required during install (zip helps extracting archives)
+RUN docker-php-ext-install zip
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
