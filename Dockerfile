@@ -43,8 +43,8 @@ COPY --from=composer_builder /app/vendor ./vendor
 COPY --from=composer_builder /app/composer.json ./composer.json
 
 # Copy built assets from node_builder
-# Vite commonly outputs to `public/build` or `dist`; adjust if your project uses a different path
-COPY --from=node_builder /app/dist ./public/build
+# Vite (laravel-vite-plugin) outputs to `public/build` by default
+COPY --from=node_builder /app/public/build ./public/build
 
 # Copy application source
 COPY . .
