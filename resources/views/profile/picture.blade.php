@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-xl mx-auto py-10">
     <h2 class="text-2xl font-bold mb-6 text-emerald-700 dark:text-emerald-300">Update Profile Picture</h2>
-    <form id="profile-picture-form" method="POST" action="{{ route('profile.picture') }}" enctype="multipart/form-data" class="space-y-6">
+    <form id="profile-picture-form" method="POST" action="{{ route('profile.picture.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         <div class="flex flex-col items-center gap-4">
             @if(auth()->user()->profile_picture_url)

@@ -81,7 +81,7 @@ Route::get('/recipes-ajax', [RecipeController::class, 'indexAjax'])->name('recip
 // Profile settings routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile/picture', [\App\Http\Controllers\ProfileController::class, 'showPicture'])->name('profile.picture');
-    Route::post('/profile/picture', [\App\Http\Controllers\ProfileController::class, 'updatePicture'])->name('profile.picture');
+    Route::post('/profile/picture', [\App\Http\Controllers\ProfileController::class, 'updatePicture'])->name('profile.picture.update');
 });
 
 // Admin routes (protected with authentication, email verification, and admin privileges)
