@@ -31,9 +31,13 @@ FROM php:8.2-fpm-alpine
 ARG APP_USER=www-data
 WORKDIR /var/www/html
 
-# Install system packages and PHP extensions
-RUN apk add --no-cache nginx supervisor libzip-dev oniguruma-dev curl bash tzdata \
-    && docker-php-ext-install pdo_mysql mbstring bcmath zip
+# Add the installer script for PHP extensions from mlocati and install packages
+# Copy the helper installer from the official image and use it to install extensions
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+# Install system packages (no -dev packages) and install PHP extensions with the helper
+RUN apk add --no-cache nginx supervisor curl bash tzdata \
+    && install-php-extensions pdo_mysql mbstring bcmath zip
 
 # Create directories and set permissions
 RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache /run/php \
