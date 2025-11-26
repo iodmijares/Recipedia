@@ -123,3 +123,18 @@
     </div>
 </div>
 @endsection
+
+@if($errors->any())
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @foreach($errors->all() as $error)
+                try {
+                    showBootstrapToast('error', @json($error));
+                } catch (e) {
+                    // Fallback: dispatch event if direct call isn't available yet
+                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: @json($error)}}));
+                }
+            @endforeach
+        });
+    </script>
+@endif

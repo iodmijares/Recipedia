@@ -39,7 +39,7 @@ class LoginController extends Controller
             if (!$user->hasVerifiedEmail()) {
                 Auth::logout(); // Log them out immediately
                 session(['verification_user_id' => $user->id]);
-                return redirect()->route('verification.show')->with('warning', 'Please verify your email before logging in.');
+                return redirect()->route('verification.notice')->with('warning', 'Please verify your email before logging in.');
             }
             
             $request->session()->regenerate();

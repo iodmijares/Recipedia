@@ -41,10 +41,14 @@
             if(data.success) {
                 window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Profile picture updated!', type: 'success' } }));
                 if(data.url) {
-                    document.querySelector('img[alt="Profile Picture"]').src = data.url;
+                    const img = document.querySelector('img[alt="Profile Picture"]');
+                    if (img) img.src = data.url;
                 }
+                // Redirect to index (root) after a short delay so user sees the toast
+                setTimeout(function(){ window.location.href = '/'; }, 900);
             } else {
-                window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: 'Error updating picture.', type: 'error' } }));
+                const msg = data.message || 'Error updating picture.';
+                window.dispatchEvent(new CustomEvent('show-toast', { detail: { message: msg, type: 'error' } }));
             }
         })
         .catch(() => {

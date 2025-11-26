@@ -143,3 +143,35 @@
     </div>
 </div>
 @endsection
+
+@if($errors->any() || session('success') || session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if($errors->any())
+                @foreach($errors->all() as $error)
+                    try {
+                        showBootstrapToast('error', @json($error));
+                    } catch (e) {
+                        window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: @json($error)}}));
+                    }
+                @endforeach
+            @endif
+
+            @if(session('success'))
+                try {
+                    showBootstrapToast('success', @json(session('success')));
+                } catch (e) {
+                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'success', message: @json(session('success'))}}));
+                }
+            @endif
+
+            @if(session('error'))
+                try {
+                    showBootstrapToast('error', @json(session('error')));
+                } catch (e) {
+                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: @json(session('error'))}}));
+                }
+            @endif
+        });
+    </script>
+@endif
