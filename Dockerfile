@@ -23,7 +23,8 @@ RUN docker-php-ext-install zip
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+# Install dependencies but skip scripts (package discovery requires application files present)
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
 # Stage 3: Runtime image with PHP-FPM and Nginx
 FROM php:8.2-fpm-alpine
@@ -48,6 +49,10 @@ COPY --from=node_builder /app/public/build ./public/build
 
 # Copy application source
 COPY . .
+
+# Run Laravel package discovery now that the application files are present.
+# Use || true to avoid failing the build if discovery has environment-specific issues.
+RUN php artisan package:discover --ansi || true
 
 # Remove default nginx config and add our config
 RUN rm -f /etc/nginx/conf.d/default.conf
