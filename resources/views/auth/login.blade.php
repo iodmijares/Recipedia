@@ -127,14 +127,15 @@
 @if($errors->any())
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            @foreach($errors->all() as $error)
+            const errors = @json($errors->all());
+            errors.forEach(error => {
                 try {
-                    showBootstrapToast('error', @json($error));
+                    showBootstrapToast('error', error);
                 } catch (e) {
                     // Fallback: dispatch event if direct call isn't available yet
-                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: @json($error)}}));
+                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: error}}));
                 }
-            @endforeach
+            });
         });
     </script>
 @endif
