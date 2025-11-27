@@ -12,7 +12,7 @@
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: {
                             type: 'info',
-                            message: "{{ addslashes(session('status')) }}"
+                            message: @json(session('status'))
                         }
                     }));
                 });
