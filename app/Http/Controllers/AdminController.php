@@ -37,7 +37,7 @@ class AdminController extends Controller
 
         // Send approval email to submitter
         try {
-            Mail::to($recipe->submitter_email)->send(new RecipeApproved($recipe));
+            Mail::to($recipe->submitter_email)->queue(new RecipeApproved($recipe));
         } catch (\Exception $e) {
             Log::warning('Failed to send recipe approval email: ' . $e->getMessage());
         }
@@ -55,7 +55,7 @@ class AdminController extends Controller
         
         // Send rejection email to submitter before deleting
         try {
-            Mail::to($submitterEmail)->send(new RecipeRejected($recipe));
+            Mail::to($submitterEmail)->queue(new RecipeRejected($recipe));
         } catch (\Exception $e) {
             Log::warning('Failed to send recipe rejection email: ' . $e->getMessage());
         }
