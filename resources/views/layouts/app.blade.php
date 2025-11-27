@@ -166,7 +166,6 @@
                                    class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('admin.*') ? 'bg-purple-100 text-purple-700' : 'text-gray-700 hover:bg-purple-50' }} rounded-xl transition-all duration-200 shadow-sm">
                                     Admin Dashboard
                                 </a>
-                                <a href="#" class="block px-4 py-3 text-lg font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 shadow-sm">View Profile</a>
                                 <a href="{{ route('profile.picture') }}" class="block px-4 py-3 text-lg font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 shadow-sm">Update Profile Picture</a>
                             @else
                                 <a href="{{ route('verification.notice') }}" 
