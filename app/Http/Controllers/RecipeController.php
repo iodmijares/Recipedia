@@ -203,7 +203,7 @@ class RecipeController extends Controller
             // Redirect with success message (global toast)
             return redirect('/')->with('toast_success', "Thank you! Your recipe '{$recipe->recipe_name}' has been submitted for review.");
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Log the error
             Log::error('Recipe submission failed: ' . $e->getMessage());
 
