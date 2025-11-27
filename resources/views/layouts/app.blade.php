@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light" data-bs-theme="light">
     <head>
         <meta charset="utf-8">
         <link rel="icon" type="image/png" href="/images/favicon.png"/>
@@ -72,7 +72,7 @@
         <x-flash-messages />
         <div class="min-h-screen flex flex-col">
             <!-- Navigation -->
-            <nav class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50 rounded-b-2xl border-b border-gray-200 dark:border-gray-700">
+            <nav class="bg-white shadow-lg sticky top-0 z-50 rounded-b-2xl border-b border-gray-200">
                 <div class="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
                     <div class="flex justify-between items-center h-20 gap-6">
                         <!-- Logo/Brand -->
@@ -83,19 +83,19 @@
                         <!-- Desktop Navigation -->
                         <div class="hidden md:flex items-center space-x-4">
                             <a href="{{ route('recipes.index') }}" 
-                               class="px-4 py-2 text-base font-semibold {{ request()->routeIs('recipes.index') ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400' }} rounded-xl transition-all duration-200 shadow-sm">
+                               class="px-4 py-2 text-base font-semibold {{ request()->routeIs('recipes.index') ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-blue-600' }} rounded-xl transition-all duration-200 shadow-sm">
                                 Browse Recipes
                             </a>
                             @auth
                                 @if(auth()->user()->hasVerifiedEmail())
                                     <a href="{{ route('recipes.create') }}" 
-                                       class="px-4 py-2 text-base font-semibold {{ request()->routeIs('recipes.create') ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-emerald-500 hover:bg-emerald-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
+                                       class="px-4 py-2 text-base font-semibold {{ request()->routeIs('recipes.create') ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500 hover:bg-emerald-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
                                        style="color: white !important;">
                                         Submit Recipe
                                     </a>
                                     @if(auth()->user()->isAdmin())
                                     <a href="{{ route('admin.dashboard') }}" 
-                                       class="px-4 py-2 text-base font-semibold {{ request()->routeIs('admin.*') ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-purple-500 hover:bg-purple-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
+                                       class="px-4 py-2 text-base font-semibold {{ request()->routeIs('admin.*') ? 'bg-purple-100 text-purple-700' : 'bg-purple-500 hover:bg-purple-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
                                        style="color: white !important;">
                                         Admin
                                     </a>
@@ -103,13 +103,13 @@
                                     <!-- Settings/Profile Dropdown -->
                                     <div class="relative" x-data="{ open: false }">
                                         <div class="relative">
-                                            <button type="button" id="profileDropdownBtn" class="px-4 py-2 text-base font-semibold rounded-xl flex items-center gap-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 shadow-sm">
+                                            <button type="button" id="profileDropdownBtn" class="px-4 py-2 text-base font-semibold rounded-xl flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 shadow-sm">
                                                 <i class="fa fa-user"></i>
                                                 <span>Profile</span>
                                                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                                             </button>
-                                            <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl py-3 z-50 border border-gray-100 dark:border-gray-700" style="display: none;">
-                                                <a href="{{ route('profile.picture') }}" class="block px-5 py-3 text-base text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl">Update Profile Picture</a>
+                                            <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-3 z-50 border border-gray-100" style="display: none;">
+                                                <a href="{{ route('profile.picture') }}" class="block px-5 py-3 text-base text-gray-700 hover:bg-gray-50 rounded-xl">Update Profile Picture</a>
                                                 <form method="POST" action="{{ route('logout') }}" class="d-inline">
                                                     @csrf
                                                     <button type="submit" class="btn btn-danger w-100">Logout</button>
@@ -122,11 +122,11 @@
                                
                             @else
                                 <a href="{{ route('login') }}" 
-                                   class="px-4 py-2 text-base font-semibold {{ request()->routeIs('login') ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400' }} rounded-xl transition-all duration-200 shadow-sm">
+                                   class="px-4 py-2 text-base font-semibold {{ request()->routeIs('login') ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-blue-600' }} rounded-xl transition-all duration-200 shadow-sm">
                                     Login
                                 </a>
                                 <a href="{{ route('register') }}" 
-                                   class="px-4 py-2 text-base font-semibold {{ request()->routeIs('register') ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-emerald-500 hover:bg-emerald-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
+                                   class="px-4 py-2 text-base font-semibold {{ request()->routeIs('register') ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500 hover:bg-emerald-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
                                    style="color: white !important;">
                                     Register
                                 </a>
@@ -135,7 +135,7 @@
                         <!-- Mobile menu button -->
                         <div class="md:hidden flex items-center">
                             <button type="button" 
-                                    class="bg-gray-50 dark:bg-gray-700 inline-flex items-center justify-center p-3 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-200 shadow-sm"
+                                    class="bg-gray-50 inline-flex items-center justify-center p-3 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-200 shadow-sm"
                                     aria-controls="mobile-menu" 
                                     aria-expanded="false"
                                     onclick="toggleMobileMenu()">
@@ -151,48 +151,48 @@
 
                 <!-- Mobile menu -->
                 <div class="md:hidden hidden" id="mobile-menu">
-                    <div class="px-6 pt-4 pb-6 space-y-3 sm:px-6 bg-white dark:bg-gray-800 rounded-b-2xl shadow-xl border-t border-gray-200 dark:border-gray-700">
+                    <div class="px-6 pt-4 pb-6 space-y-3 sm:px-6 bg-white rounded-b-2xl shadow-xl border-t border-gray-200">
                         <a href="{{ route('recipes.index') }}" 
-                           class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('recipes.index') ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20' }} rounded-xl transition-all duration-200 shadow-sm">
+                           class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('recipes.index') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-blue-50' }} rounded-xl transition-all duration-200 shadow-sm">
                             Browse Recipes
                         </a>
                         @auth
                             @if(auth()->user()->hasVerifiedEmail())
                                 <a href="{{ route('recipes.create') }}" 
-                                   class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('recipes.create') ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20' }} rounded-xl transition-all duration-200 shadow-sm">
+                                   class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('recipes.create') ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-emerald-50' }} rounded-xl transition-all duration-200 shadow-sm">
                                     Submit Recipe
                                 </a>
                                 <a href="{{ route('admin.dashboard') }}" 
-                                   class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('admin.*') ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' : 'text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20' }} rounded-xl transition-all duration-200 shadow-sm">
+                                   class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('admin.*') ? 'bg-purple-100 text-purple-700' : 'text-gray-700 hover:bg-purple-50' }} rounded-xl transition-all duration-200 shadow-sm">
                                     Admin Dashboard
                                 </a>
-                                <a href="#" class="block px-4 py-3 text-lg font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 shadow-sm">View Profile</a>
-                                <a href="{{ route('profile.picture') }}" class="block px-4 py-3 text-lg font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 shadow-sm">Update Profile Picture</a>
+                                <a href="#" class="block px-4 py-3 text-lg font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 shadow-sm">View Profile</a>
+                                <a href="{{ route('profile.picture') }}" class="block px-4 py-3 text-lg font-semibold text-gray-700 hover:bg-gray-50 rounded-xl transition-all duration-200 shadow-sm">Update Profile Picture</a>
                             @else
                                 <a href="{{ route('verification.notice') }}" 
-                                   class="block px-4 py-3 text-lg font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 rounded-xl transition-all duration-200 shadow-sm">
+                                   class="block px-4 py-3 text-lg font-semibold bg-amber-100 text-amber-700 rounded-xl transition-all duration-200 shadow-sm">
                                     Verify Email
                                 </a>
                             @endif
-                            <div class="border-t border-gray-200 dark:border-gray-600 mt-4 pt-4">
-                                <div class="px-4 py-2 text-base text-gray-500 dark:text-gray-400">
+                            <div class="border-t border-gray-200 mt-4 pt-4">
+                                <div class="px-4 py-2 text-base text-gray-500">
                                     Signed in as <span class="font-semibold">{{ auth()->user()->name }}</span>
                                 </div>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit" 
-                                            class="block w-full text-left px-4 py-3 text-lg font-semibold text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200 shadow-sm">
+                                            class="block w-full text-left px-4 py-3 text-lg font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 shadow-sm">
                                         Logout
                                     </button>
                                 </form>
                             </div>
                         @else
                             <a href="{{ route('login') }}" 
-                               class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('login') ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20' }} rounded-xl transition-all duration-200 shadow-sm">
+                               class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('login') ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-blue-50' }} rounded-xl transition-all duration-200 shadow-sm">
                                 Login
                             </a>
                             <a href="{{ route('register') }}" 
-                               class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('register') ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'text-gray-700 dark:text-gray-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20' }} rounded-xl transition-all duration-200 shadow-sm">
+                               class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('register') ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-emerald-50' }} rounded-xl transition-all duration-200 shadow-sm">
                                 Register
                             </a>
                         @endauth
@@ -205,11 +205,11 @@
             </main>
 
             <!-- Footer -->
-            <footer class="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-lg mt-12">
+            <footer class="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-t border-gray-200 shadow-lg mt-12">
                 <div class="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-10 flex flex-col items-center">
                     <div class="w-full flex flex-col items-center">
-                        <p class="text-base text-gray-500 dark:text-gray-400 text-center mb-2">
-                            &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved. <span class="font-semibold text-emerald-600 dark:text-emerald-400">I.M</span>
+                        <p class="text-base text-gray-500 text-center mb-2">
+                            &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved. <span class="font-semibold text-emerald-600">I.M</span>
                         </p>
                         
                     </div>

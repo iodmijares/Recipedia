@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8">
-    <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-8">
+    <div class="max-w-3xl mx-auto bg-white  rounded-lg shadow p-8">
         @if(session('status'))
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -18,8 +18,8 @@
                 });
             </script>
         @endif
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">{{ $recipe->recipe_name }}</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Submitted by {{ $recipe->submitter_name }} on {{ $recipe->created_at->format('M j, Y g:i A') }}</p>
+        <h1 class="text-2xl font-bold text-gray-900  mb-4">{{ $recipe->recipe_name }}</h1>
+        <p class="text-sm text-gray-500  mb-2">Submitted by {{ $recipe->submitter_name }} on {{ $recipe->created_at->format('M j, Y g:i A') }}</p>
         <div class="mb-6">
             @if($images && count($images) > 0)
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -30,7 +30,7 @@
                     @endforeach
                 </div>
             @else
-                <div class="h-32 w-32 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                <div class="h-32 w-32 bg-gray-100  rounded-lg flex items-center justify-center">
                     <svg class="h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -38,15 +38,15 @@
             @endif
         </div>
         <div class="mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Ingredients</h2>
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ $recipe->ingredients }}</p>
+            <h2 class="text-lg font-semibold text-gray-900  mb-2">Ingredients</h2>
+            <div class="bg-gray-50  rounded-lg p-4">
+                <p class="text-gray-700  whitespace-pre-line">{{ $recipe->ingredients }}</p>
             </div>
         </div>
         <div class="mb-6">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Instructions</h2>
-            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                <p class="text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ $recipe->instructions }}</p>
+            <h2 class="text-lg font-semibold text-gray-900  mb-2">Instructions</h2>
+            <div class="bg-gray-50  rounded-lg p-4">
+                <p class="text-gray-700  whitespace-pre-line">{{ $recipe->instructions }}</p>
             </div>
         </div>
         <div class="flex gap-3 justify-end mt-8">

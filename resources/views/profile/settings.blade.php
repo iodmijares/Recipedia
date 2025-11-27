@@ -6,15 +6,15 @@
 <div class="max-w-2xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
     
     <!-- Main Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
+    <div class="bg-white  rounded-xl shadow-lg border border-gray-100  overflow-hidden">
         
         <!-- Card Header -->
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-600 flex items-center gap-3">
-            <div class="bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-lg">
+        <div class="px-6 py-4 bg-gray-50  border-b border-gray-100  flex items-center gap-3">
+            <div class="bg-emerald-100  p-2 rounded-lg">
                 @if(auth()->user()->profile_picture_url)
-                    <img src="{{ auth()->user()->profile_picture_url }}" alt="Profile Picture" class="h-10 w-10 rounded-full object-cover border-2 border-emerald-400 dark:border-emerald-600 shadow-md">
+                    <img src="{{ auth()->user()->profile_picture_url }}" alt="Profile Picture" class="h-10 w-10 rounded-full object-cover border-2 border-emerald-400  shadow-md">
                 @else
-                    <svg class="h-10 w-10 text-emerald-500 dark:text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="h-10 w-10 text-emerald-500 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 @endif
@@ -30,8 +30,8 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="pt-4 flex items-center justify-end gap-3 border-t border-gray-100 dark:border-gray-700 mt-6">
-                    <button type="button" onclick="history.back()" class="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <div class="pt-4 flex items-center justify-end gap-3 border-t border-gray-100  mt-6">
+                    <button type="button" onclick="history.back()" class="px-5 py-2.5 rounded-lg text-sm font-medium text-gray-700  hover:bg-gray-100  transition-colors">
                         Cancel
                     </button>
                     <button type="submit" id="save-btn" class="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium py-2.5 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">

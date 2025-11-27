@@ -3,33 +3,33 @@
 @section('title', 'Verify Your Email')
 
 @section('content')
-<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 ">
     
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-        <div class="bg-white dark:bg-gray-800 py-8 px-4 shadow-xl shadow-emerald-900/10 sm:rounded-xl sm:px-10 border border-gray-100 dark:border-gray-700 relative overflow-hidden">
+        <div class="bg-white  py-8 px-4 shadow-xl shadow-emerald-900/10 sm:rounded-xl sm:px-10 border border-gray-100  relative overflow-hidden">
             
             <!-- Decorative Top Border -->
             <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
 
             <!-- Header Icon & Title (Moved Inside) -->
             <div class="text-center mb-8">
-                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mb-4 animate-bounce-slow">
-                    <svg class="h-8 w-8 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-100  mb-4 animate-bounce-slow">
+                    <svg class="h-8 w-8 text-emerald-600 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 class="text-2xl font-bold text-gray-900 ">
                     Verify Your Identity
                 </h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                <p class="text-sm text-gray-500  mt-2">
                     Check your email for the 6-digit code we sent to <br>
-                    <span class="font-semibold text-emerald-600 dark:text-emerald-400">{{ $user->email }}</span>
+                    <span class="font-semibold text-emerald-600 ">{{ $user->email }}</span>
                 </p>
             </div>
 
             <!-- Status Messages -->
             @if (session('status') === 'verification-otp-sent')
-                <div class="mb-6 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 p-4 border border-emerald-100 dark:border-emerald-800">
+                <div class="mb-6 rounded-lg bg-emerald-50  p-4 border border-emerald-100 ">
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <svg class="h-5 w-5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor">
@@ -37,7 +37,7 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-emerald-800 dark:text-emerald-200">
+                            <p class="text-sm font-medium text-emerald-800 ">
                                 A new code has been sent to your email.
                             </p>
                         </div>
@@ -49,7 +49,7 @@
             @endif
 
             @if ($errors->any())
-                <div class="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 p-4 border border-red-100 dark:border-red-800">
+                <div class="mb-6 rounded-lg bg-red-50  p-4 border border-red-100 ">
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -57,7 +57,7 @@
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-red-800 dark:text-red-200">
+                            <p class="text-sm font-medium text-red-800 ">
                                 {{ $errors->first() }}
                             </p>
                         </div>
@@ -75,7 +75,7 @@
                         <input type="text" 
                                id="otp" 
                                name="otp" 
-                               class="block w-full text-center text-3xl font-mono font-bold tracking-[0.5em] rounded-lg border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-700 dark:text-white py-4 transition-colors duration-200" 
+                               class="block w-full text-center text-3xl font-mono font-bold tracking-[0.5em] rounded-lg border-gray-300  shadow-sm focus:border-emerald-500 focus:ring-emerald-500   py-4 transition-colors duration-200" 
                                placeholder="000000"
                                maxlength="6"
                                pattern="[0-9]{6}"
@@ -94,12 +94,12 @@
             </form>
 
             <!-- Footer / Resend Link -->
-            <div class="mt-8 border-t border-gray-100 dark:border-gray-700 pt-6">
-                <div class="flex items-center justify-center space-x-1 text-sm text-gray-600 dark:text-gray-400">
+            <div class="mt-8 border-t border-gray-100  pt-6">
+                <div class="flex items-center justify-center space-x-1 text-sm text-gray-600 ">
                     <span>Didn't receive the code?</span>
                     <form method="POST" action="{{ route('verification.send') }}" class="inline">
                         @csrf
-                        <button type="submit" class="font-medium text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 transition-colors duration-200 focus:outline-none underline">
+                        <button type="submit" class="font-medium text-emerald-600 hover:text-emerald-500   transition-colors duration-200 focus:outline-none underline">
                             Send new code
                         </button>
                     </form>
@@ -107,7 +107,7 @@
                 <div class="mt-4 text-center">
                     <a href="{{ route('logout') }}" 
                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
-                       class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                       class="text-xs text-gray-400 hover:text-gray-600  transition-colors">
                         Log out
                     </a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
