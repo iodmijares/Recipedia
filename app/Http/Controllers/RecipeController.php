@@ -189,14 +189,14 @@ class RecipeController extends Controller
             try {
                 $adminEmails = User::where('role', 'admin')->pluck('email')->toArray();
                 if (!empty($adminEmails)) {
-                    Mail::to($adminEmails)->send(new NewRecipeSubmitted($recipe));
+                    Mail::to($adminEmails)->queue(new NewRecipeSubmitted($recipe));
                 } else {
                     // Fallback to app admin email if no admin users found
                     $fallbackEmail = config('app.admin_email', 'admin@example.com');
-                    Mail::to($fallbackEmail)->send(new NewRecipeSubmitted($recipe));
+                    Mail::to($fallbackEmail)->queue(new NewRecipeSubmitted($recipe));
                 }
-            } catch (\Exception $e) {
-                Log::warning('Failed to send recipe notification email: ' . $e->getMessage());
+            } catch (\Throwable $e) {
+                Log::warning('Failed to queue recipe notification email: ' . $e->getMessage());
                 // Continue with success response even if email fails
             }
 
