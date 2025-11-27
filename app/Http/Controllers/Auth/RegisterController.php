@@ -47,7 +47,7 @@ class RegisterController extends Controller
             session(['verification_user_id' => $user->id]);
             
             return redirect()->route('verification.notice');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('Failed to send OTP after registration: ' . $e->getMessage());
             return back()->withErrors(['email' => 'Registration successful, but failed to send verification email. Please try logging in.']);
         }
