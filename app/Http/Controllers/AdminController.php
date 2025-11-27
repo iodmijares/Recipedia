@@ -55,7 +55,7 @@ class AdminController extends Controller
         
         // Send rejection email to submitter before deleting
         try {
-            Mail::to($submitterEmail)->queue(new RecipeRejected($recipe));
+            Mail::to($submitterEmail)->send(new RecipeRejected($recipe));
         } catch (\Throwable $e) {
             Log::warning('Failed to send recipe rejection email: ' . $e->getMessage());
         }
