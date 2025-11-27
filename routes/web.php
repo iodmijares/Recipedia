@@ -45,6 +45,7 @@ Route::post('/email/verification-notification', [EmailVerificationController::cl
 // Test email route (for debugging SMTP)
 Route::get('/test-email', function () {
     try {
+        // Queue the email instead of sending synchronously to avoid timeouts
         Mail::raw('This is a test email to verify SMTP configuration is working correctly.', function ($message) {
             $message->to('iodmijares@usm.edu.ph')
                    ->subject('SMTP Test - Recipe Book App');
@@ -52,12 +53,12 @@ Route::get('/test-email', function () {
         
         return response()->json([
             'status' => 'success',
-            'message' => 'Test email sent successfully! Check your inbox at iodmijares@usm.edu.ph'
+            'message' => 'Test email queued successfully! Check your inbox at iodmijares@usm.edu.ph (and ensure your queue worker is running).'
         ]);
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         return response()->json([
             'status' => 'error',
-            'message' => 'Failed to send email: ' . $e->getMessage()
+            'message' => 'Failed to queue email: ' . $e->getMessage()
         ], 500);
     }
 })->name('test.email');
