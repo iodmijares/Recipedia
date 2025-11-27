@@ -147,31 +147,35 @@
 @if($errors->any() || session('success') || session('error'))
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            @if($errors->any())
-                @foreach($errors->all() as $error)
+            const errors = @json($errors->all());
+            const successMessage = @json(session('success'));
+            const errorMessage = @json(session('error'));
+
+            if (errors.length > 0) {
+                errors.forEach(error => {
                     try {
-                        showBootstrapToast('error', @json($error));
+                        showBootstrapToast('error', error);
                     } catch (e) {
-                        window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: @json($error)}}));
+                        window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: error}}));
                     }
-                @endforeach
-            @endif
+                });
+            }
 
-            @if(session('success'))
+            if (successMessage) {
                 try {
-                    showBootstrapToast('success', @json(session('success')));
+                    showBootstrapToast('success', successMessage);
                 } catch (e) {
-                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'success', message: @json(session('success'))}}));
+                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'success', message: successMessage}}));
                 }
-            @endif
+            }
 
-            @if(session('error'))
+            if (errorMessage) {
                 try {
-                    showBootstrapToast('error', @json(session('error')));
+                    showBootstrapToast('error', errorMessage);
                 } catch (e) {
-                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: @json(session('error'))}}));
+                    window.dispatchEvent(new CustomEvent('show-toast', {detail: {type: 'error', message: errorMessage}}));
                 }
-            @endif
+            }
         });
     </script>
 @endif
