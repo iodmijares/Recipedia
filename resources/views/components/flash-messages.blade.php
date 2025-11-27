@@ -12,11 +12,14 @@
 </div>
 
 <script>
-	function showBootstrapToast(type, message) {
+	window.showBootstrapToast = function(type, message) {
 		const toastEl = document.getElementById('global-toast');
 		const toastTitle = document.getElementById('toast-title');
 		const toastBody = document.getElementById('toast-body');
 		const toastIcon = document.getElementById('toast-icon');
+        
+        if (!toastEl) return;
+
 		let iconHtml = '';
 		let titleText = '';
 		let bgClass = '';
@@ -48,26 +51,39 @@
 		toastBody.textContent = message;
 		// Remove previous bg classes
 		toastEl.classList.remove('bg-success','bg-danger','bg-warning','bg-info','text-white','text-dark');
-		toastEl.classList.add(...bgClass.split(' '));
-		const toast = new bootstrap.Toast(toastEl);
-		toast.show();
+		if (bgClass) {
+            const classes = bgClass.split(' ');
+            classes.forEach(c => toastEl.classList.add(c));
+        }
+        
+        if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+		    const toast = new bootstrap.Toast(toastEl);
+		    toast.show();
+        } else {
+            console.warn('Bootstrap JS not loaded, cannot show toast');
+            // Fallback for debugging
+            toastEl.style.display = 'block';
+            setTimeout(() => { toastEl.style.display = 'none'; }, 3500);
+        }
 	}
 
-	window.addEventListener('show-toast', function(e) {
-		showBootstrapToast(e.detail.type || 'info', e.detail.message || '');
-	});
-</script>
+    document.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('show-toast', function(e) {
+            showBootstrapToast(e.detail.type || 'info', e.detail.message || '');
+        });
 
-@if(session('toast_success'))
-	<script>document.addEventListener('DOMContentLoaded',function(){showBootstrapToast('success', @json(session('toast_success')));});</script>
-@endif
-@if(session('toast_error'))
-	<script>document.addEventListener('DOMContentLoaded',function(){showBootstrapToast('error', @json(session('toast_error')));});</script>
-@endif
-@if(session('toast_warning'))
-	<script>document.addEventListener('DOMContentLoaded',function(){showBootstrapToast('warning', @json(session('toast_warning')));});</script>
-@endif
-@if(session('toast_info'))
-	<script>document.addEventListener('DOMContentLoaded',function(){showBootstrapToast('info', @json(session('toast_info')));});</script>
-@endif
+        @if(session('toast_success'))
+            showBootstrapToast('success', @json(session('toast_success')));
+        @endif
+        @if(session('toast_error'))
+            showBootstrapToast('error', @json(session('toast_error')));
+        @endif
+        @if(session('toast_warning'))
+            showBootstrapToast('warning', @json(session('toast_warning')));
+        @endif
+        @if(session('toast_info'))
+            showBootstrapToast('info', @json(session('toast_info')));
+        @endif
+    });
+</script>
  
