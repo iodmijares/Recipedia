@@ -17,9 +17,9 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'Admin',
                 'email' => 'admin@recipedia.com',
-                'password' => bcrypt('admin@admin'), // Change password as needed
-                'is_admin' => true, // Assuming you have this field
-                'role' => 'admin'   // Assuming you have this field
+                'password' => 'admin@admin', // Password will be hashed by the model cast
+                'role' => 'admin',
+                'email_verified_at' => now(),
             ]
         );
     }
