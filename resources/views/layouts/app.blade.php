@@ -68,7 +68,7 @@
             // document.getElementById('show-fa-icons-btn').addEventListener('click', loadFontAwesome);
         </script>
     </head>
-    <body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <body class="bg-gray-50 min-h-screen">
         <x-flash-messages />
         <div class="min-h-screen flex flex-col">
             <!-- Navigation -->

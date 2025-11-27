@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
 
         // Seed recipes and ratings
         $this->call([
+            AdminSeeder::class,
             RecipeSeeder::class,
             RatingSeeder::class,
         ]);
