@@ -45,19 +45,20 @@ Unlike Vercel, Railway provides a persistent filesystem (if configured with volu
     npm ci && npm run build && composer install --no-dev --optimize-autoloader
     ```
 3.  **Start Command:**
-    ```bash
-    php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=$PORT
-    ```
-    *Wait!* `php artisan serve` is for development. For robust production on Railway, Nixpacks usually sets up Nginx/Apache.
+    **CRITICAL:** Do NOT use `php artisan serve` in production. It is single-threaded and slow.
     
-    **Better Start Command (if using Nixpacks default):**
-    Leave it empty. Nixpacks attempts to serve `public/index.php` using a production web server.
+    *   **Recommended:** Leave the Start Command **empty**. Railway's Nixpacks will automatically set up Nginx/Apache with PHP-FPM, which is much faster.
+    *   **Custom (if needed):** `php artisan migrate --force && php artisan optimize:production && apache2-foreground`
     
-    **If you need to run migrations:**
-    Add a "Deploy Command" or "Pre-deploy Command" in settings, or run it as part of the start command:
-    `php artisan migrate --force && apache2-foreground` (depending on the base image).
+    **Note:** If you leave it empty, you might need to run migrations manually or use a "Deploy Command".
 
-## Step 4: Credential Safety
+## Step 4: Performance Tuning (New!)
+
+We have added a `php.ini` file to the project root to enable **Opcache**. Railway should pick this up automatically.
+*   **Action:** Ensure your Railway build includes this file.
+*   **Code Optimization:** The application now uses Eager Loading to prevent database lag.
+
+## Step 5: Credential Safety
 
 *   **NEVER** commit your `.env` file. It is already in `.gitignore`.
 *   **NEVER** share your Railway project link publicly if it has "Guest" permissions.

@@ -91,7 +91,8 @@ class RecipeController extends Controller
     {
         $perPage = 9; 
 
-        $recipes = Recipe::where('is_approved', true)
+        $recipes = Recipe::with(['user', 'ratings'])
+            ->where('is_approved', true)
             ->latest()
             ->paginate($perPage)
             ->appends($request->except('page'));
@@ -279,7 +280,8 @@ class RecipeController extends Controller
     public function indexAjax(Request $request)
     {
         $perPage = 9;
-        $recipes = Recipe::where('is_approved', true)
+        $recipes = Recipe::with(['user', 'ratings'])
+            ->where('is_approved', true)
             ->latest()
             ->paginate($perPage)
             ->appends($request->except('page'));
