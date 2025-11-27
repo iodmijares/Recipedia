@@ -3,28 +3,7 @@
 @section('title', 'Recipe Details')
 
 @section('content')
-<div x-data="{
-    dark: localStorage.getItem('darkMode') === 'true',
-    toggle() {
-        this.dark = !this.dark;
-        localStorage.setItem('darkMode', this.dark);
-        document.documentElement.classList.toggle('dark', this.dark);
-    }
-}"
-    x-init="document.documentElement.classList.toggle('dark', dark)"
-    class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-    <div class="absolute top-4 right-8 z-40">
-        <button @click="toggle" type="button"
-            class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg shadow bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition">
-            <svg x-show="!dark" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-8.66l-.71.71M4.05 4.05l-.71.71M21 12h-1M4 12H3m16.66 4.95l-.71-.71M4.05 19.95l-.71-.71" />
-            </svg>
-            <svg x-show="dark" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
-            </svg>
-            <span x-text="dark ? 'Light Mode' : 'Dark Mode'"></span>
-        </button>
-    </div>
+<div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow p-8">
         @if(session('status'))
             <script>
