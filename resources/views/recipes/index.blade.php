@@ -164,7 +164,11 @@
                                 <div class="mb-4 flex-1">
                                     <div class="flex items-start">
                                         <p class="text-sm text-gray-600  line-clamp-3">
-                                            {{ Str::limit(collect(explode("\n", $recipe->ingredients))->filter()->first() . '...', 80) }}
+                                            @if($recipe->ingredients)
+                                                {{ Str::limit(collect(explode("\n", $recipe->ingredients))->filter()->first(), 80) }}
+                                            @else
+                                                No ingredients listed.
+                                            @endif
                                         </p>
                                     </div>
                                 </div>
