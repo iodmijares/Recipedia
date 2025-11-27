@@ -29,7 +29,7 @@
         @if(session('status'))
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    var statusMsg = "{{ addslashes(session('status')) }}";
+                    var statusMsg = @json(session('status'));
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: {
                             type: 'info',

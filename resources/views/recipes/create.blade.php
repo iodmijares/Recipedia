@@ -82,42 +82,32 @@
                     @csrf
                     
                     <!-- Error Toasts Above Form -->
-                    @if ($errors->any())
+                    @if ($errors->any() || session('error') || session('success'))
                         <script>
                             window.addEventListener('DOMContentLoaded', function() {
-                                var errors = @json($errors->all());
-                                errors.forEach(function(error) {
+                                const errors = @json($errors->all());
+                                const errorSession = @json(session('error'));
+                                const successSession = @json(session('success'));
+
+                                if (errors.length > 0) {
+                                    errors.forEach(function(error) {
+                                        window.dispatchEvent(new CustomEvent('show-toast', {
+                                            detail: { type: 'error', message: error }
+                                        }));
+                                    });
+                                }
+
+                                if (errorSession) {
                                     window.dispatchEvent(new CustomEvent('show-toast', {
-                                        detail: {
-                                            type: 'error',
-                                            message: error
-                                        }
+                                        detail: { type: 'error', message: errorSession }
                                     }));
-                                });
-                            });
-                        </script>
-                    @endif
-                    @if (session('error'))
-                        <script>
-                            window.addEventListener('DOMContentLoaded', function() {
-                                window.dispatchEvent(new CustomEvent('show-toast', {
-                                    detail: {
-                                        type: 'error',
-                                        message: @json(session('error'))
-                                    }
-                                }));
-                            });
-                        </script>
-                    @endif
-                    @if (session('success'))
-                        <script>
-                            window.addEventListener('DOMContentLoaded', function() {
-                                window.dispatchEvent(new CustomEvent('show-toast', {
-                                    detail: {
-                                        type: 'success',
-                                        message: @json(session('success'))
-                                    }
-                                }));
+                                }
+
+                                if (successSession) {
+                                    window.dispatchEvent(new CustomEvent('show-toast', {
+                                        detail: { type: 'success', message: successSession }
+                                    }));
+                                }
                             });
                         </script>
                     @endif
