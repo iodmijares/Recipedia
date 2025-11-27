@@ -20,7 +20,7 @@
                         <svg class="w-4 h-4 mr-2 text-gray-500 " fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                         </svg>
-                        View Live Site
+                        View Live
                     </a>
                 </div>
             </div>
@@ -128,9 +128,10 @@
 
                                 <div class="mt-auto pt-4 border-t border-gray-100  flex gap-2">
                                     <a href="{{ route('admin.recipe.show', $recipe) }}" 
-                                       class="flex-1 inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100  transition-colors shadow-sm">
-                                        Review Recipe
+                                       class="inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100  transition-colors shadow-sm">
+                                        Review Details
                                     </a>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -147,7 +148,6 @@
                         <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
                         Recently Approved
                     </h2>
-                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-700  transition-colors">View All History &rarr;</a>
                 </div>
 
                 <div class="bg-white  rounded-2xl shadow-sm border border-gray-200  overflow-hidden">
@@ -178,8 +178,6 @@
                                                 </div>
                                                 <div class="ml-4">
                                                     <div class="text-sm font-medium text-gray-900 ">{{ $recipe->recipe_name }}</div>
-                                                    <div class="text-xs text-gray-500">ID: #{{ $recipe->id }}</div>
-                                                </div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -191,7 +189,19 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('recipes.show', $recipe) }}" class="text-indigo-600 hover:text-indigo-900  ">View</a>
+                                            <a href="{{ route('recipes.show', $recipe) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
+
+                                            <form action="{{ route('admin.toggle', $recipe) }}" method="POST" class="inline-block mr-2">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="text-amber-600 hover:text-amber-800">Unpublish</button>
+                                            </form>
+
+                                            <form action="{{ route('admin.reject', $recipe) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to reject and delete this recipe?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach

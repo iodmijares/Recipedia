@@ -92,4 +92,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'admin']
     Route::patch('/recipes/{recipe}/approve', [AdminController::class, 'approve'])->name('approve');
     Route::delete('/recipes/{recipe}/reject', [AdminController::class, 'reject'])->name('reject');
     Route::patch('/recipes/{recipe}/toggle', [AdminController::class, 'toggle'])->name('toggle');
+
+    // User Management Routes
+    Route::resource('users', App\Http\Controllers\AdminUserController::class);
 });
