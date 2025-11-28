@@ -50,6 +50,13 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
+        'brevo' => [
+            'transport' => 'sendinblue',
+            'key' => env('BREVO_KEY'),
+            // 'host' => env('BREVO_HOST', 'api.brevo.com'), // Optional, usually not needed for API
+            // 'port' => env('BREVO_PORT', 587), // Optional, usually not needed for API
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],
