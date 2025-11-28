@@ -25,7 +25,9 @@ class AdminController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('admin.dashboard', compact('pendingRecipes', 'approvedRecipes'));
+        $totalUsers = \App\Models\User::count();
+
+        return view('admin.dashboard', compact('pendingRecipes', 'approvedRecipes', 'totalUsers'));
     }
 
     /**

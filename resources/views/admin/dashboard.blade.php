@@ -63,17 +63,33 @@
                 </div>
             </div>
 
-            <!-- Total Card -->
+            <!-- Total Recipes Card -->
             <div class="bg-white  rounded-xl p-6 border border-gray-100  shadow-sm relative overflow-hidden group">
                 <div class="absolute right-0 top-0 h-full w-1 bg-indigo-500"></div>
                 <div class="flex items-center justify-between relative z-10">
                     <div>
-                        <p class="text-sm font-medium text-gray-500 ">Total Submissions</p>
+                        <p class="text-sm font-medium text-gray-500 ">Total Recipes</p>
                         <h3 class="text-3xl font-bold text-gray-900  mt-1">{{ $pendingRecipes->count() + $approvedRecipes->count() }}</h3>
                     </div>
                     <div class="p-3 bg-indigo-50  rounded-lg text-indigo-600  group-hover:scale-110 transition-transform">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Users Card -->
+            <div class="bg-white  rounded-xl p-6 border border-gray-100  shadow-sm relative overflow-hidden group">
+                <div class="absolute right-0 top-0 h-full w-1 bg-purple-500"></div>
+                <div class="flex items-center justify-between relative z-10">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 ">Total Users</p>
+                        <h3 class="text-3xl font-bold text-gray-900  mt-1">{{ $totalUsers }}</h3>
+                    </div>
+                    <div class="p-3 bg-purple-50  rounded-lg text-purple-600  group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h2a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2m0 0l4-4m-4 4l-4-4m4 4V7m0 13a2 2 0 002 2h2a2 2 0 002-2m-8 0h.01"></path>
                         </svg>
                     </div>
                 </div>
@@ -129,8 +145,24 @@
                                 <div class="mt-auto pt-4 border-t border-gray-100  flex gap-2">
                                     <a href="{{ route('admin.recipe.show', $recipe) }}" 
                                        class="inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100  transition-colors shadow-sm">
-                                        Review Details
+                                        Review
                                     </a>
+                                    <form action="{{ route('admin.approve', $recipe) }}" method="POST" class="inline-block">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-white bg-emerald-500 rounded-lg hover:bg-emerald-600 focus:ring-4 focus:ring-emerald-100  transition-colors shadow-sm"
+                                                onclick="return confirm('Are you sure you want to approve this recipe?');">
+                                            Approve
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.reject', $recipe) }}" method="POST" class="inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-red-500 bg-red-100 rounded-lg hover:bg-red-200 focus:ring-4 focus:ring-red-100  transition-colors shadow-sm"
+                                                onclick="return confirm('Are you sure you want to reject and delete this recipe? This action cannot be undone.');">
+                                            Reject
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -139,83 +171,79 @@
             </div>
         @endif
 
-        <!-- Approved Section -->
-        @if($approvedRecipes->count() > 0)
-            <div>
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg font-bold text-gray-900  flex items-center gap-2">
-                        <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
-                        Recently Approved
-                    </h2>
-                </div>
-
-                <div class="bg-white  rounded-2xl shadow-sm border border-gray-200  overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 ">
-                            <thead class="bg-gray-50 ">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500  uppercase tracking-wider">Recipe</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500  uppercase tracking-wider">Author</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-500  uppercase tracking-wider">Date Approved</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-500  uppercase tracking-wider">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200  bg-white ">
-                                @foreach($approvedRecipes->take(5) as $recipe)
-                                    <tr class="hover:bg-gray-50  transition-colors">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="h-10 w-10 flex-shrink-0">
-                                                    @php $images = json_decode($recipe->recipe_images, true); @endphp
-                                                    @if($images && count($images) > 0)
-                                                        <img class="h-10 w-10 rounded-lg object-cover" src="{{ asset('storage/' . $images[0]) }}" alt="">
-                                                    @else
-                                                        <div class="h-10 w-10 rounded-lg bg-gray-100  flex items-center justify-center text-gray-400">
-                                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <!-- Approved Section -->
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-bold text-gray-900  flex items-center gap-2">
+                                <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
+                                Approved Recipes
+                            </h2>
+                        </div>
+        
+                        <div class="bg-white  rounded-xl shadow-sm border border-gray-200  overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 ">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Recipe</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Author</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date Approved</th>
+                                            <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200  bg-white ">
+                                        @foreach($approvedRecipes as $recipe)
+                                            <tr class="hover:bg-gray-50  transition-colors">
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="flex items-center">
+                                                        <div class="h-10 w-10 flex-shrink-0">
+                                                            @php $images = json_decode($recipe->recipe_images, true); @endphp
+                                                            @if($images && count($images) > 0)
+                                                                <img class="h-10 w-10 rounded-lg object-cover" src="{{ asset('storage/' . $images[0]) }}" alt="{{ $recipe->recipe_name }}">
+                                                            @else
+                                                                <div class="h-10 w-10 rounded-lg bg-gray-100  flex items-center justify-center text-gray-400">
+                                                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                                                </div>
+                                                            @endif
                                                         </div>
-                                                    @endif
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900 ">{{ $recipe->recipe_name }}</div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-500 ">{{ $recipe->submitter_name }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800  ">
-                                                {{ $recipe->updated_at->format('M d, Y') }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="{{ route('recipes.show', $recipe) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View</a>
-
-                                            <form action="{{ route('admin.toggle', $recipe) }}" method="POST" class="inline-block mr-2">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="text-amber-600 hover:text-amber-800">Unpublish</button>
-                                            </form>
-
-                                            <form action="{{ route('admin.reject', $recipe) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to reject and delete this recipe?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                                        <div class="ml-4">
+                                                            <div class="text-sm font-medium text-gray-900 ">{{ $recipe->recipe_name }}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="text-sm text-gray-500 ">{{ $recipe->submitter_name }}</div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800  ">
+                                                        {{ $recipe->updated_at->format('M d, Y') }}
+                                                    </span>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <a href="{{ route('recipes.show', $recipe) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">View Public</a>
+        
+                                                    <form action="{{ route('admin.toggle', $recipe) }}" method="POST" class="inline-block mr-2">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="text-amber-600 hover:text-amber-800">Unpublish</button>
+                                                    </form>
+        
+                                                    <form action="{{ route('admin.reject', $recipe) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to reject and delete this recipe?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-800">Delete</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bg-gray-50  px-6 py-3 border-t border-gray-200  text-center">
+                                {{ $approvedRecipes->links() }}
+                            </div>
+                        </div>
                     </div>
-                    @if($approvedRecipes->count() > 5)
-                    <div class="bg-gray-50  px-6 py-3 border-t border-gray-200  text-center">
-                        <a href="#" class="text-xs font-medium text-gray-500 hover:text-gray-700  transition-colors">Show all {{ $approvedRecipes->count() }} approved recipes</a>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        @endif
-
     </div>
 </div>
 @endsection
