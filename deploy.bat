@@ -12,18 +12,14 @@ echo Building front-end assets...
 npm ci
 npm run build
 
-echo Clearing config and cache to ensure current DB settings are used...
-php artisan config:clear
-php artisan cache:clear
-
-echo Running database migrations (will use DB settings from .env)...
+echo Running database migrations...
 php artisan migrate --force
 
-echo Creating storage symlink and optimizing caches...
+echo Optimizing application for production...
+php artisan optimize:production
+
+echo Creating storage symlink...
 php artisan storage:link
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
 
 echo Deployment steps complete. Review the output for errors.
 pause
