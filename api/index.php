@@ -1,8 +1,5 @@
 <?php
 
-echo "Hello World from Vercel PHP";
-exit;
-
 // Force configuration for Vercel's read-only filesystem
 // The only writable directory is /tmp
 
