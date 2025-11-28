@@ -7,12 +7,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-openssl": "*",
         "barryvdh/laravel-dompdf": "^3.1",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "phpmailer/phpmailer": "^7.0",
-        "ext-openssl": "*",
-        "symfony/sendinblue-mailer": "^7.0"
+        "symfony/sendinblue-mailer": "^6.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
