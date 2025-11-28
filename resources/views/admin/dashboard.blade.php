@@ -142,27 +142,11 @@
                                     <span class="whitespace-nowrap">{{ $recipe->created_at->diffForHumans(null, true) }}</span>
                                 </div>
 
-                                <div class="mt-auto pt-4 border-t border-gray-100  flex gap-2">
-                                    <a href="{{ route('admin.recipe.show', $recipe) }}" 
-                                       class="inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100  transition-colors shadow-sm">
-                                        Review
+                                <div class="mt-auto pt-4 border-t border-gray-100 flex gap-2 justify-center w-full">
+                                    <a href="{{ route('admin.recipe.show', $recipe) }}"
+                                       class="inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-100 transition-colors shadow-sm">
+                                        Review details
                                     </a>
-                                    <form action="{{ route('admin.approve', $recipe) }}" method="POST" class="inline-block">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-white bg-emerald-500 rounded-lg hover:bg-emerald-600 focus:ring-4 focus:ring-emerald-100  transition-colors shadow-sm"
-                                                onclick="return confirm('Are you sure you want to approve this recipe?');">
-                                            Approve
-                                        </button>
-                                    </form>
-                                    <form action="{{ route('admin.reject', $recipe) }}" method="POST" class="inline-block">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex justify-center items-center px-4 py-2 text-sm font-semibold text-red-500 bg-red-100 rounded-lg hover:bg-red-200 focus:ring-4 focus:ring-red-100  transition-colors shadow-sm"
-                                                onclick="return confirm('Are you sure you want to reject and delete this recipe? This action cannot be undone.');">
-                                            Reject
-                                        </button>
-                                    </form>
                                 </div>
                             </div>
                         </div>
