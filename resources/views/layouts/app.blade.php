@@ -11,9 +11,6 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/ajax.min.css') }}">
-
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <style>
@@ -35,9 +32,6 @@
             }
         </style>
         
-        <script src="{{ asset('js/bootstrap.bundle.min.js') }}" defer></script>
-        <script src="{{ asset('js/ajax.bundle.min.js') }}"></script>
-
         <script>
             function loadFontAwesome() {
                 if (!document.querySelector('link[href*="font-awesome"]')) {

@@ -1,4 +1,6 @@
 import './bootstrap';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import '../js/ajax.bundle.min.js';
 
 // Dynamic AJAX recipe grid for browse page
 if (document.getElementById('recipe-grid')) {

@@ -17,11 +17,13 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        $pendingRecipes = Recipe::where('is_approved', false)
+        $pendingRecipes = Recipe::with('user')
+            ->where('is_approved', false)
             ->latest()
             ->paginate(10);
 
-        $approvedRecipes = Recipe::where('is_approved', true)
+        $approvedRecipes = Recipe::with('user')
+            ->where('is_approved', true)
             ->latest()
             ->paginate(10);
 
