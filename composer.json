@@ -68,6 +68,14 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
+        "run-all": [
+            "@php artisan optimize:clear",
+            "@php artisan key:generate",
+            "@php artisan storage:link",
+            "@php artisan migrate --force",
+            "@php artisan db:seed --force",
+            "@php artisan optimize:production"
+        ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ]

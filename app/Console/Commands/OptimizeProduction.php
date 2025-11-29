@@ -41,3 +41,4 @@ class OptimizeProduction extends Command
         $this->info('Production optimization complete!');
     }
 }
+
