@@ -7,7 +7,7 @@ This file serves as a context reference for the Gemini AI agent regarding the **
 
 ## 🛠 Project Architecture
 - **Framework:** Laravel 12.x
-- **Language:** PHP 8.2+
+- **Language:** PHP 8.4+
 - **Frontend:** 
   - Blade Templates
   - Tailwind CSS (configured via `tailwind.config.js`)
