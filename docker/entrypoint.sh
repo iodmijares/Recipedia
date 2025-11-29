@@ -6,12 +6,7 @@ set -e
 
 echo "🚀 Starting deployment tasks..."
 
-if [ -n "$App_Key" ]; then
-    echo "✅ APP_KEY is set."
-else
-    echo "⚠️  APP_KEY is missing! Generating one..."
-    php artisan key:generate --force
-fi
+
 
 echo "📦 Running migrations..."
 php artisan migrate --force
