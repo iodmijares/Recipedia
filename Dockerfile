@@ -1,15 +1,27 @@
+# --------------------------------------------------------------------------
+# Stage 1: Build Frontend Assets (Node.js)
+# --------------------------------------------------------------------------
+FROM node:20-slim AS node_builder
 
+WORKDIR /app
+COPY package*.json vite.config.js ./
+# If you have a Tailwind config, copy it too
+COPY resources ./resources 
+# Copy specific folders needed for build, or just COPY . . to be safe
+COPY . . 
+
+RUN npm ci && npm run build
+
+# --------------------------------------------------------------------------
+# Stage 2: Build PHP Application
+# --------------------------------------------------------------------------
 FROM php:8.4-fpm
 
-# Install build-time dependencies, runtime libraries and PHP extensions
+# 1. Install system dependencies and PHP extensions
+# We include 'libssl-dev' but DO NOT put 'openssl' in docker-php-ext-install
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git \
     unzip \
-    autoconf \
-    gcc \
-    g++ \
-    make \
-    pkg-config \
     libonig-dev \
     libzip-dev \
     libpng-dev \
@@ -20,77 +32,40 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     zlib1g-dev \
     supervisor \
     curl \
-    ca-certificates \
-    gnupg \
+    # Build tools for PECL (Redis)
+    autoconf gcc g++ make pkg-config \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath intl zip opcache \
-    # Install redis via PECL (uses phpize/php-config present in image)
     && pecl install redis \
     && docker-php-ext-enable redis \
+    # CLEANUP: Remove build tools to reduce image size
+    && apt-get purge -y --auto-remove autoconf gcc g++ make pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Composer (copy from official Composer image)
-COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
+# 2. Configure PHP (Optional but recommended)
+RUN echo "upload_max_filesize=10M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size=10M" >> /usr/local/etc/php/conf.d/uploads.ini
+
+# 3. Install Composer
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy composer files first to leverage Docker cache
+# 4. Install PHP Dependencies
+# We copy composer files first for Docker Layer Caching
 COPY composer.json composer.lock ./
+# Note: --no-scripts prevents errors because 'artisan' isn't copied yet
+RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --no-interaction --prefer-dist --no-scripts
 
-# Install PHP dependencies (production)
-RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --no-interaction --prefer-dist
-
-# Copy rest of the application
+# 5. Copy Application Code
 COPY . .
 
-# Build frontend assets if package.json exists
-RUN if [ -f package.json ]; then \
-      # install nodejs + npm from distro repos only if needed
-      apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends nodejs npm && \
-      npm ci --silent && npm run build --silent && \
-      rm -rf /var/lib/apt/lists/*; \
-    fi
+# 6. Copy Compiled Frontend Assets from Stage 1
+# This puts the built CSS/JS into the public folder without installing Node.js here
+COPY --from=node_builder /app/public/build /var/www/html/public/build
 
-# Ensure correct permissions for storage and cache
+# 7. Final Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-EXPOSE 9000
-CMD ["php-fpm"]
-# Use official PHP 8.4 FPM image
-FROM php:8.4-fpm
-
-# Install system packages and PHP extensions required by Laravel + common libs
-RUN apt-get update && apt-get install -y \
-    git unzip libonig-dev libzip-dev libpng-dev libicu-dev libxml2-dev \
-    libcurl4-openssl-dev libssl-dev zlib1g-dev supervisor curl npm nodejs make pkg-config libsodium-dev \
- && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath intl zip opcache openssl \
- && git clone https://github.com/phpredis/phpredis.git /usr/src/php/ext/redis \
- && ls -la /usr/src/php/ext/redis \
- && ls -la /usr/src/php/ext/redis/modules \
- && docker-php-ext-install redis \
- && rm -rf /usr/src/php/ext/redis \
- && rm -rf /var/lib/apt/lists/*
-
-# Install Composer (copy from composer official image)
-COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www/html
-
-# Copy composer files first to leverage Docker cache
-COPY composer.json composer.lock ./
-
-# Install PHP dependencies (production)
-RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --no-interaction --prefer-dist
-
-# Copy rest of the application
-COPY . .
-
-# Build frontend (optional: consider building assets in CI instead)
-RUN if [ -f package.json ]; then \
-      apt-get update && apt-get install -y nodejs npm && npm ci --silent && npm run build --silent; \
-    fi
-
-# Set permissions for storage and bootstrap cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
+# 8. Start
 EXPOSE 9000
 CMD ["php-fpm"]
