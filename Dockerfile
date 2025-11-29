@@ -66,8 +66,13 @@ COPY --from=node_builder /app/public/build /var/www/html/public/build
 # 8. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+# 9. Entrypoint
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # CHANGE 3: Apache listens on Port 80 (Railway maps this automatically)
 EXPOSE 80
 
-# CHANGE 4: Use the default Apache start command
-CMD ["apache2-foreground"]
+# CHANGE 4: Use the entrypoint script
+ENTRYPOINT ["entrypoint.sh"]
