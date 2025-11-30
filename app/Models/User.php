@@ -186,9 +186,29 @@ class User extends Authenticatable
      */
         public function getProfilePictureUrlAttribute()
     {
-            if ($this->profile_picture) {
+            if (!$this->profile_picture) {
+                return null;
+            }
+
+            // Try to generate a URL via the configured filesystem. If the
+            // configured driver (e.g. 'cloudinary') is not available in this
+            // runtime (missing package or misconfiguration), fall back to
+            // returning the stored value directly which may already be a full URL.
+            try {
                 return Storage::url($this->profile_picture);
-        }
-        return null;
+            } catch (\InvalidArgumentException $e) {
+                // This exception is thrown when the disk/driver is not supported.
+                Log::warning('Filesystem driver not available for profile picture: ' . $e->getMessage(), [
+                    'user_id' => $this->id,
+                    'profile_picture' => $this->profile_picture,
+                ]);
+                return $this->profile_picture;
+            } catch (\Throwable $e) {
+                // Unexpected errors (e.g. network or SDK issues) — log and return fallback.
+                Log::error('Error generating profile picture URL: ' . $e->getMessage(), [
+                    'user_id' => $this->id,
+                ]);
+                return $this->profile_picture;
+            }
     }
 }
