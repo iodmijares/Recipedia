@@ -114,7 +114,7 @@
                         <div class="group bg-white  rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100  flex flex-col h-full overflow-hidden">
                             <!-- Image -->
                             <div class="relative h-48 overflow-hidden bg-gray-100 ">
-                                @php $images = json_decode($recipe->recipe_images, true); @endphp
+                                @php $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : []; @endphp
                                 @if($images && count($images) > 0)
                                     <img src="{{ asset('storage/' . $images[0]) }}" 
                                          alt="{{ $recipe->recipe_name }}" 
@@ -181,7 +181,7 @@
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="flex items-center">
                                                         <div class="h-10 w-10 flex-shrink-0">
-                                                            @php $images = json_decode($recipe->recipe_images, true); @endphp
+                                                            @php $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : []; @endphp
                                                             @if($images && count($images) > 0)
                                                                 <img class="h-10 w-10 rounded-lg object-cover" src="{{ asset('storage/' . $images[0]) }}" alt="{{ $recipe->recipe_name }}">
                                                             @else
