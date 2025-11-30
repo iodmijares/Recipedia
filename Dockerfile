@@ -5,17 +5,18 @@ FROM node:20-slim AS node_builder
 
 WORKDIR /app
 COPY package*.json vite.config.js ./
+# Copy resources to build assets
 COPY resources ./resources 
+# We don't need the whole app, just resources, but copying . is safer for some configs
 COPY . . 
 RUN npm ci && npm run build
 
 # --------------------------------------------------------------------------
 # Stage 2: Build PHP Application (Apache)
 # --------------------------------------------------------------------------
-
 FROM php:8.4-apache
 
-
+# 1. Install System Dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git \
     unzip \
@@ -29,17 +30,24 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     zlib1g-dev \
     supervisor \
     curl \
+    # Build tools for extensions
     autoconf gcc g++ make pkg-config \
+    # Install PHP Extensions
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath intl zip opcache \
+    # Install Redis
     && pecl install redis \
     && docker-php-ext-enable redis \
+    # Clean up build tools to reduce image size
     && apt-get purge -y --auto-remove autoconf gcc g++ make pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-
+# 2. Apache Configuration
 RUN a2enmod rewrite
 
+# [FIX] Suppress the "Could not reliably determine the server's fully qualified domain name" warning
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
+# Set Document Root
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
@@ -60,7 +68,7 @@ RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --n
 # 6. Copy Application Code
 COPY . .
 
-# 7. Copy Frontend Assets
+# 7. Copy Frontend Assets (from Stage 1)
 COPY --from=node_builder /app/public/build /var/www/html/public/build
 
 # 8. Permissions
@@ -71,8 +79,9 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# CHANGE 3: Apache listens on Port 80 (Railway maps this automatically)
+# [FIX] Apache defaults to Port 80.
+# If you expose 8000 but Apache is on 80, Railway/Deployment will fail because it can't connect.
 EXPOSE 80
 
-# CHANGE 4: Use the entrypoint script
+# 10. Run Entrypoint
 ENTRYPOINT ["entrypoint.sh"]
