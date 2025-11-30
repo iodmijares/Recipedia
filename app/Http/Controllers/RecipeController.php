@@ -165,34 +165,9 @@ class RecipeController extends Controller
             $imagePaths = [];
             if ($request->hasFile('recipe_images')) {
                 foreach ($request->file('recipe_images') as $image) {
-                    try {
-                        // Prefer uploading to the configured Cloudinary disk. This requires
-                        // installing a Cloudinary filesystem adapter (see instructions below).
-                        $path = Storage::disk('cloudinary')->putFile('recipes', $image);
-
-                        // Some adapters return the public URL directly from putFile,
-                        // others return a storage key. Try to get a usable URL.
-                        try {
-                            $url = Storage::disk('cloudinary')->url($path);
-                        } catch (\Throwable $e) {
-                            // If the adapter doesn't support url(), fall back to the
-                            // returned path (which may already be a URL) or build one.
-                            $url = is_string($path) && str_starts_with($path, 'http') ? $path : $path;
-                        }
-
-                        $imagePaths[] = $url;
-                    } catch (\InvalidArgumentException $e) {
-                        // This indicates the 'cloudinary' driver isn't available; fall back
-                        // to storing locally in the public disk so uploads still work.
-                        Log::warning('Cloudinary disk not available, falling back to local storage: ' . $e->getMessage());
-                        $localPath = $image->store('uploads', 'public');
-                        $imagePaths[] = asset('storage/' . $localPath);
-                    } catch (\Throwable $e) {
-                        // Log unexpected failures and continue (skip this image)
-                        Log::error('Image upload failed: ' . $e->getMessage(), [
-                            'file' => $image->getClientOriginalName(),
-                        ]);
-                    }
+                    // Store the image using the default configured disk (Cloudinary or public)
+                    // This returns the relative path/ID which is best for the database.
+                    $imagePaths[] = $image->store('uploads');
                 }
             }
 

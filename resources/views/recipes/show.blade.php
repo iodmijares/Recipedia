@@ -36,7 +36,7 @@
             <div class="relative h-64 md:h-80 bg-gray-200 group">
                 @php $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : json_decode($recipe->recipe_images, true); @endphp
                 @if($images && count($images) > 0)
-                    <img src="{{ asset('storage/' . $images[0]) }}" 
+                    <img src="{{ Storage::url($images[0]) }}" 
                          alt="{{ $recipe->recipe_name }}"
                          class="w-full h-full object-cover">
                 @else
