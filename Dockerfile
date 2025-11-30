@@ -68,6 +68,11 @@ RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --n
 # 6. Copy Application Code
 COPY . .
 
+# 6.a Regenerate optimized Composer autoload now that app files are present
+# This fixes issues where composer was run earlier (before copying app files)
+# with --classmap-authoritative and the classmap didn't include application classes.
+RUN composer dump-autoload --optimize --classmap-authoritative --no-interaction || true
+
 # 7. Copy Frontend Assets (from Stage 1)
 COPY --from=node_builder /app/public/build /var/www/html/public/build
 
