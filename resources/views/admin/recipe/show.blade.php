@@ -8,7 +8,7 @@
         @if(session('status'))
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    var statusMsg = @json(session('status'));
+                    var statusMsg = {!! json_encode(session('status')) !!};
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: {
                             type: 'info',

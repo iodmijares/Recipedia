@@ -92,7 +92,7 @@ class AdminController extends Controller
      */
     public function show(Recipe $recipe)
     {
-        $images = json_decode($recipe->recipe_images, true);
+        $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : (array) $recipe->recipe_images;
         return view('admin.recipe.show', compact('recipe', 'images'));
     }
 }
