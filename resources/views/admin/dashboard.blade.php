@@ -116,10 +116,7 @@
                             <div class="relative h-48 overflow-hidden bg-gray-100 ">
                                 @php $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : []; @endphp
                                 @if($images && count($images) > 0)
-                                    @php
-                                        $imgSrc = (strpos($images[0], 'http') === 0) ? $images[0] : asset('storage/' . $images[0]);
-                                    @endphp
-                                    <img src="{{ $imgSrc }}" 
+                                     <img src="{{ Storage::url($images[0]) }}" 
                                          alt="{{ $recipe->recipe_name }}" 
                                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
                                 @else
@@ -186,10 +183,7 @@
                                                         <div class="h-10 w-10 flex-shrink-0">
                                                             @php $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : []; @endphp
                                                             @if($images && count($images) > 0)
-                                                                @php
-                                                                    $imgSrc = (strpos($images[0], 'http') === 0) ? $images[0] : asset('storage/' . $images[0]);
-                                                                @endphp
-                                                                <img class="h-10 w-10 rounded-lg object-cover" src="{{ $imgSrc }}" alt="{{ $recipe->recipe_name }}">
+                                                                <img class="h-10 w-10 rounded-lg object-cover" src="{{ Storage::url($images[0]) }}" alt="{{ $recipe->recipe_name }}">
                                                             @else
                                                                 <div class="h-10 w-10 rounded-lg bg-gray-100  flex items-center justify-center text-gray-400">
                                                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
