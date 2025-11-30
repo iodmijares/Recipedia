@@ -62,9 +62,19 @@ return [
         'cloudinary' => [
             'driver' => 'cloudinary',
             'notification_url' => env('CLOUDINARY_NOTIFICATION_URL'),
+            // The Cloudinary Laravel adapter expects either a single 'url' entry
+            // or the keys 'cloud', 'key', and 'secret'. Provide both styles
+            // (and keep the older names) so the config is compatible.
+            'url' => env('CLOUDINARY_URL'),
+            // Legacy / convenience names (used elsewhere in app)
             'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
             'api_key' => env('CLOUDINARY_API_KEY'),
             'api_secret' => env('CLOUDINARY_API_SECRET'),
+            // Keys expected by the adapter
+            'cloud' => env('CLOUDINARY_CLOUD_NAME'),
+            'key' => env('CLOUDINARY_API_KEY'),
+            'secret' => env('CLOUDINARY_API_SECRET'),
+            'secure' => env('CLOUDINARY_SECURE', true),
         ],
 
     ],
