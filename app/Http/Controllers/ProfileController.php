@@ -24,7 +24,9 @@ class ProfileController extends Controller
 
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
-            $path = $file->store('profile_pictures', 'public');
+            // Use the default disk (e.g., 'cloudinary' or 'public')
+            $path = $file->store('profile_pictures');
+            
             $user->profile_picture = $path;
             try {
                 $user->save();
@@ -34,7 +36,8 @@ class ProfileController extends Controller
                 return response()->json(['success' => false, 'message' => 'Failed to save profile picture.'], 500);
             }
 
-            $url = Storage::url($path);
+            // Generate the correct URL based on the configured disk
+            $url = $user->profile_picture_url;
             return response()->json(['success' => true, 'url' => $url]);
         }
 

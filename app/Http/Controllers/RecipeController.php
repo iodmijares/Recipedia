@@ -184,7 +184,7 @@ class RecipeController extends Controller
             $recipe->prep_time = $prepTime;
             $recipe->ingredients = $validated['ingredients'];
             $recipe->instructions = $validated['instructions'];
-            $recipe->recipe_images = json_encode($imagePaths);
+            $recipe->recipe_images = $imagePaths;
             $recipe->is_approved = false; // Default to false
             $recipe->save();
 
