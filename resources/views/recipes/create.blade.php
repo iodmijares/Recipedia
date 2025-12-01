@@ -78,7 +78,7 @@
         <!-- Recipe Form -->
         <div class="bg-white  rounded-xl shadow-lg overflow-hidden border border-gray-100 ">
             <div class="p-6 sm:p-8 bg-gradient-to-b from-white to-orange-50  ">
-                <form action="{{ route('recipes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form id="recipeForm" action="{{ route('recipes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
                     
                     <!-- Error Toasts Above Form -->
@@ -264,6 +264,21 @@
                                             });
                                         }
                                     }
+
+                                    // Prevent double submission
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        document.getElementById('recipeForm').addEventListener('submit', function(e) {
+                                            var btn = document.getElementById('submitBtn');
+                                            if (btn.disabled) {
+                                                e.preventDefault();
+                                                return;
+                                            }
+                                            btn.disabled = true;
+                                            var originalText = btn.innerText;
+                                            btn.innerText = 'Submitting...';
+                                            btn.classList.add('opacity-75', 'cursor-not-allowed');
+                                        });
+                                    });
                                 </script>
                             </div>
                         </div>
@@ -272,6 +287,7 @@
                     <!-- Submit Buttons -->
                     <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-orange-200 ">
                         <button type="submit" 
+                                id="submitBtn"
                                 class="flex-1 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all duration-200">
                             Submit Recipe
                         </button>
