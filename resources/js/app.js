@@ -1,5 +1,6 @@
 import './bootstrap';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
 import '../js/ajax.bundle.min.js';
 
 // Dynamic AJAX recipe grid for browse page

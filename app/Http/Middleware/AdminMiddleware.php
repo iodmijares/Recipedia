@@ -28,9 +28,9 @@ class AdminMiddleware
             return redirect()->route('verification.notice')->with('error', 'Please verify your email first.');
         }
 
-        // Check if user is admin
-        if (!$user->isAdmin()) {
-            return redirect()->route('recipes.index')->with('error', 'Access denied. Admin privileges required.');
+        // Check if user is admin or moderator
+        if (!$user->hasAdminAccess()) {
+            return redirect()->route('recipes.index')->with('error', 'Access denied. Admin/Moderator privileges required.');
         }
 
         return $next($request);

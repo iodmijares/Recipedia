@@ -75,16 +75,14 @@
                                         Submit Recipe
                                     </a>
 
-                                    @if(auth()->user()->isAdmin())
+                                    @if(auth()->user()->hasAdminAccess())
                                         <a href="{{ route('admin.dashboard') }}" 
                                            class="px-4 py-2 text-base font-semibold {{ request()->routeIs('admin.*') && !request()->routeIs('admin.users.*') ? 'bg-purple-100 text-purple-700' : 'bg-purple-500 hover:bg-purple-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
                                            style="color: white !important;">
                                             Admin Dashboard
                                         </a>
 
-                                        @if(
-                                            \Illuminate\Support\Facades\Route::has('admin.users.index')
-                                        )
+                                        @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('admin.users.index'))
                                             <a href="{{ route('admin.users.index') }}" 
                                                class="px-4 py-2 text-base font-semibold {{ request()->routeIs('admin.users.*') ? 'bg-indigo-100 text-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
                                                style="color: white !important;">
@@ -153,13 +151,13 @@
                                    class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('recipes.create') ? 'bg-emerald-100 text-emerald-700' : 'text-gray-700 hover:bg-emerald-50' }} rounded-xl transition-all duration-200 shadow-sm">
                                     Submit Recipe
                                 </a>
-                                @if(auth()->user()->isAdmin())
+                                @if(auth()->user()->hasAdminAccess())
                                     <a href="{{ route('admin.dashboard') }}" 
                                        class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('admin.dashboard') ? 'bg-purple-100 text-purple-700' : 'text-gray-700 hover:bg-purple-50' }} rounded-xl transition-all duration-200 shadow-sm">
                                         Admin Dashboard
                                     </a>
 
-                                    @if(\Illuminate\Support\Facades\Route::has('admin.users.index'))
+                                    @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('admin.users.index'))
                                         <a href="{{ route('admin.users.index') }}" 
                                            class="block px-4 py-3 text-lg font-semibold {{ request()->routeIs('admin.users.*') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700 hover:bg-indigo-50' }} rounded-xl transition-all duration-200 shadow-sm">
                                             Manage Users

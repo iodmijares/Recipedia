@@ -12,6 +12,19 @@ use App\Http\Requests\UpdateUserRequest;
 class AdminUserController extends Controller
 {
     /**
+     * Enforce Admin-only access for User Management.
+     */
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if (!auth()->user()->isAdmin()) {
+                return redirect()->route('admin.dashboard')->with('toast_error', 'Access denied. Only Admins can manage users.');
+            }
+            return $next($request);
+        });
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
