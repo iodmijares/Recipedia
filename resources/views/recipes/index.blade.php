@@ -73,7 +73,7 @@
         }
         document.addEventListener('DOMContentLoaded', function() {
             updateRatings();
-            setInterval(updateRatings, 10000); // Update every 10 seconds
+            setInterval(updateRatings, 60000); // Update every 60 seconds
         });
         </script>
         @if($recipes->count() > 0)
@@ -140,8 +140,8 @@
 
                                 <!-- Rating Stars -->
                                 @php 
-                                    $avgRating = $recipe->ratings->avg('rating'); 
-                                    $ratingCount = $recipe->ratings->count();
+                                    $avgRating = $recipe->ratings_avg_rating ?? 0; 
+                                    $ratingCount = $recipe->ratings_count ?? 0;
                                 @endphp
                                 <div class="flex items-center mb-3" title="Average Rating: {{ number_format($avgRating, 1) }}">
                                     <div class="flex items-center">

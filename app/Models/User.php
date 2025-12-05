@@ -77,7 +77,7 @@ class User extends Authenticatable
         Log::info('OTP sent for email verification', [
             'user_id' => $this->id,
             'email' => $this->email,
-            'otp' => $otp, // Remove this in production for security
+            // OTP intentionally not logged for security
             'expires_at' => $this->otp_expires_at,
         ]);
     }

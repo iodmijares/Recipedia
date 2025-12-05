@@ -42,26 +42,27 @@ Route::post('/email/verification-notification', [EmailVerificationController::cl
     ->middleware('throttle:6,1')
     ->name('verification.send');
 
-// Test email route (for debugging SMTP)
-Route::get('/test-email', function () {
-    try {
-        // Queue the email instead of sending synchronously to avoid timeouts
-        Mail::raw('This is a test email to verify SMTP configuration is working correctly.', function ($message) {
-            $message->to('iodmijares@usm.edu.ph')
-                   ->subject('SMTP Test - Recipe Book App');
-        });
-        
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Test email queued successfully! Check your inbox at iodmijares@usm.edu.ph (and ensure your queue worker is running).'
-        ]);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Failed to queue email: ' . $e->getMessage()
-        ], 500);
-    }
-})->name('test.email');
+// Test email route (for debugging SMTP) - ONLY available in local environment
+if (app()->environment('local')) {
+    Route::get('/test-email', function () {
+        try {
+            Mail::raw('This is a test email to verify SMTP configuration is working correctly.', function ($message) {
+                $message->to('iodmijares@usm.edu.ph')
+                       ->subject('SMTP Test - Recipe Book App');
+            });
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Test email queued successfully! Check your inbox.'
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to queue email: ' . $e->getMessage()
+            ], 500);
+        }
+    })->name('test.email');
+}
 
 // Recipe routes
 Route::get('/recipes', [RecipeController::class, 'index'])->name('recipes.index');
@@ -72,9 +73,13 @@ Route::post('/recipes', [RecipeController::class, 'store'])
     ->middleware(['auth', 'verified', 'throttle:10,1'])
     ->name('recipes.store');
 
-// Rating submission route
-Route::post('/recipes/{recipe}/rate', [RecipeController::class, 'rate'])->name('recipes.rate');
-Route::post('/recipes/{recipe}/rate-ajax', [RecipeController::class, 'rateAjax'])->name('recipes.rateAjax');
+// Rating submission route (requires authentication)
+Route::post('/recipes/{recipe}/rate', [RecipeController::class, 'rate'])
+    ->middleware('auth')
+    ->name('recipes.rate');
+Route::post('/recipes/{recipe}/rate-ajax', [RecipeController::class, 'rateAjax'])
+    ->middleware('auth')
+    ->name('recipes.rateAjax');
 
 // AJAX endpoint for recipes pagination
 Route::get('/recipes-ajax', [RecipeController::class, 'indexAjax'])->name('recipes.indexAjax');

@@ -6,6 +6,7 @@ use App\Mail\NewRecipeSubmitted;
 use App\Models\Recipe;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -46,6 +47,9 @@ class RecipeController extends Controller
         $ratingsCount = $recipe->ratings()->count();
         $userRating = $recipe->ratings()->where('user_id', $user->id)->first()->rating;
 
+        // Clear recipe ratings cache
+        Cache::forget("recipe_{$recipe->id}_ratings");
+
         return response()->json([
             'message' => $msg,
             'averageRating' => number_format($averageRating, 1),
@@ -81,6 +85,9 @@ class RecipeController extends Controller
             $msg = 'Thank you for rating this recipe!';
         }
 
+        // Clear recipe ratings cache
+        Cache::forget("recipe_{$recipe->id}_ratings");
+
         return redirect()->route('recipes.show', $recipe)
             ->with('rating_status', $msg);
     }
@@ -89,13 +96,19 @@ class RecipeController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = 9; 
+        $perPage = 9;
+        $page = $request->get('page', 1);
+        $cacheKey = "recipes_index_page_{$page}";
 
-        $recipes = Recipe::with(['user', 'ratings'])
-            ->where('is_approved', true)
-            ->latest()
-            ->paginate($perPage)
-            ->appends($request->except('page'));
+        $recipes = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($perPage, $request) {
+            return Recipe::with('user')
+                ->withAvg('ratings', 'rating')
+                ->withCount('ratings')
+                ->where('is_approved', true)
+                ->latest()
+                ->paginate($perPage)
+                ->appends($request->except('page'));
+        });
 
         return view('recipes.index', compact('recipes'));
     }
@@ -110,8 +123,17 @@ class RecipeController extends Controller
             abort(404);
         }
 
-        $averageRating = $recipe->ratings()->avg('rating');
-        $ratingsCount = $recipe->ratings()->count();
+        // Cache ratings for 2 minutes
+        $cacheKey = "recipe_{$recipe->id}_ratings";
+        $ratingsData = Cache::remember($cacheKey, now()->addMinutes(2), function () use ($recipe) {
+            return [
+                'average' => $recipe->ratings()->avg('rating'),
+                'count' => $recipe->ratings()->count(),
+            ];
+        });
+
+        $averageRating = $ratingsData['average'];
+        $ratingsCount = $ratingsData['count'];
 
         return view('recipes.show', compact('recipe', 'averageRating', 'ratingsCount'));
     }
@@ -204,7 +226,7 @@ class RecipeController extends Controller
             }
 
             // Redirect with success message (global toast)
-            return redirect('/')->with('toast_success', "Thank you! Your recipe '{$recipe->recipe_name}' has been submitted for review.");
+            return redirect()->route('recipes.index')->with('toast_success', "Thank you! Your recipe '{$recipe->recipe_name}' has been submitted and is awaiting admin approval.");
 
         } catch (\Throwable $e) {
             // Log the error
@@ -282,11 +304,26 @@ class RecipeController extends Controller
     public function indexAjax(Request $request)
     {
         $perPage = 9;
-        $recipes = Recipe::with(['user', 'ratings'])
-            ->where('is_approved', true)
-            ->latest()
-            ->paginate($perPage)
-            ->appends($request->except('page'));
+        $page = $request->get('page', 1);
+        $cacheKey = "recipes_ajax_page_{$page}";
+
+        $recipes = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($perPage, $request) {
+            return Recipe::with('user')
+                ->withAvg('ratings', 'rating')
+                ->withCount('ratings')
+                ->where('is_approved', true)
+                ->latest()
+                ->paginate($perPage)
+                ->appends($request->except('page'));
+        });
+
+        // Transform data to include avg_rating and rating_count as expected by JS
+        $recipes->getCollection()->transform(function ($recipe) {
+            $recipe->avg_rating = $recipe->ratings_avg_rating ?? 0;
+            $recipe->rating_count = $recipe->ratings_count ?? 0;
+            return $recipe;
+        });
+
         // Return only the data needed for AJAX rendering
         return response()->json([
             'recipes' => $recipes->items(),

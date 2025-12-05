@@ -6,6 +6,7 @@ use App\Mail\RecipeApproved;
 use App\Mail\RecipeRejected;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -17,17 +18,24 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
-        $pendingRecipes = Recipe::with('user')
-            ->where('is_approved', false)
-            ->latest()
-            ->paginate(10);
+        // Cache dashboard data for 2 minutes
+        $pendingRecipes = Cache::remember('admin_pending_recipes', now()->addMinutes(2), function () {
+            return Recipe::with('user')
+                ->where('is_approved', false)
+                ->latest()
+                ->paginate(10);
+        });
 
-        $approvedRecipes = Recipe::with('user')
-            ->where('is_approved', true)
-            ->latest()
-            ->paginate(10);
+        $approvedRecipes = Cache::remember('admin_approved_recipes', now()->addMinutes(2), function () {
+            return Recipe::with('user')
+                ->where('is_approved', true)
+                ->latest()
+                ->paginate(10);
+        });
 
-        $totalUsers = \App\Models\User::count();
+        $totalUsers = Cache::remember('admin_total_users', now()->addMinutes(5), function () {
+            return \App\Models\User::count();
+        });
 
         return view('admin.dashboard', compact('pendingRecipes', 'approvedRecipes', 'totalUsers'));
     }
@@ -38,6 +46,9 @@ class AdminController extends Controller
     public function approve(Recipe $recipe)
     {
         $recipe->update(['is_approved' => true]);
+
+        // Clear relevant caches
+        $this->clearRecipeCaches();
 
         // Send approval email to submitter
         try {
@@ -64,12 +75,17 @@ class AdminController extends Controller
             Log::warning('Failed to send recipe rejection email: ' . $e->getMessage());
         }
         
-        // Delete the image file if it exists
-        if ($recipe->recipe_image) {
-            Storage::disk('public')->delete($recipe->recipe_image);
+        // Delete the image files if they exist
+        if ($recipe->recipe_images) {
+            foreach ($recipe->recipe_images as $image) {
+                Storage::delete($image);
+            }
         }
 
         $recipe->delete();
+
+        // Clear relevant caches
+        $this->clearRecipeCaches();
 
         return redirect()->route('admin.dashboard')->with('toast_warning', "⚠️ Recipe '{$recipeName}' rejected and permanently deleted!");
     }
@@ -80,6 +96,9 @@ class AdminController extends Controller
     public function toggle(Recipe $recipe)
     {
         $recipe->update(['is_approved' => !$recipe->is_approved]);
+
+        // Clear relevant caches
+        $this->clearRecipeCaches();
 
         $status = $recipe->is_approved ? 'approved and published' : 'unapproved and hidden';
         $icon = $recipe->is_approved ? '✅' : '📝';
@@ -94,5 +113,21 @@ class AdminController extends Controller
     {
         $images = is_array($recipe->recipe_images) ? $recipe->recipe_images : (array) $recipe->recipe_images;
         return view('admin.recipe.show', compact('recipe', 'images'));
+    }
+
+    /**
+     * Clear all recipe-related caches.
+     */
+    protected function clearRecipeCaches(): void
+    {
+        // Clear admin dashboard caches
+        Cache::forget('admin_pending_recipes');
+        Cache::forget('admin_approved_recipes');
+
+        // Clear paginated recipe caches (first 10 pages)
+        for ($i = 1; $i <= 10; $i++) {
+            Cache::forget("recipes_index_page_{$i}");
+            Cache::forget("recipes_ajax_page_{$i}");
+        }
     }
 }
