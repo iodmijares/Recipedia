@@ -72,7 +72,27 @@
             </div>
         </div>
 
+        {{-- Status Indicator --}}
+        <div class="mb-6">
+            @if($recipe->is_approved)
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800">
+                    <svg class="-ml-1 mr-1.5 h-2 w-2 text-emerald-500" fill="currentColor" viewBox="0 0 8 8">
+                        <circle cx="4" cy="4" r="3" />
+                    </svg>
+                    Approved
+                </span>
+            @else
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+                    <svg class="-ml-1 mr-1.5 h-2 w-2 text-amber-500" fill="currentColor" viewBox="0 0 8 8">
+                        <circle cx="4" cy="4" r="3" />
+                    </svg>
+                    Pending Approval
+                </span>
+            @endif
+        </div>
+
         {{-- Action Buttons --}}
+        @if(!$recipe->is_approved)
         <div class="flex gap-3 justify-end mt-8">
             <form action="{{ route('admin.approve', $recipe) }}" method="POST">
                 @csrf
@@ -90,6 +110,7 @@
                 </button>
             </form>
         </div>
+        @endif
     </div>
 </div>
 @endsection

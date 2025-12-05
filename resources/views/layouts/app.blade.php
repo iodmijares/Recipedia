@@ -63,28 +63,28 @@
 
                         <div class="hidden md:flex items-center space-x-4">
                             <a href="{{ route('recipes.index') }}" 
-                               class="px-4 py-2 text-base font-semibold {{ request()->routeIs('recipes.index') ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-blue-600' }} rounded-xl transition-all duration-200 shadow-sm">
+                               class="px-3 py-1.5 text-sm font-medium {{ request()->routeIs('recipes.index') ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-blue-600' }} rounded-lg transition-all duration-200">
                                 Browse Recipes
                             </a>
                             
                             @auth
                                 @if(auth()->user()->hasVerifiedEmail())
                                     <a href="{{ route('recipes.create') }}" 
-                                       class="px-4 py-2 text-base font-semibold {{ request()->routeIs('recipes.create') ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500 hover:bg-emerald-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
+                                       class="px-3 py-1.5 text-sm font-medium {{ request()->routeIs('recipes.create') ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500 hover:bg-emerald-600 text-white' }} rounded-lg transition-all duration-200"
                                        style="color: white !important;">
                                         Submit Recipe
                                     </a>
 
                                     @if(auth()->user()->hasAdminAccess())
                                         <a href="{{ route('admin.dashboard') }}" 
-                                           class="px-4 py-2 text-base font-semibold {{ request()->routeIs('admin.*') && !request()->routeIs('admin.users.*') ? 'bg-purple-100 text-purple-700' : 'bg-purple-500 hover:bg-purple-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
+                                           class="px-3 py-1.5 text-sm font-medium {{ request()->routeIs('admin.*') && !request()->routeIs('admin.users.*') ? 'bg-purple-100 text-purple-700' : 'bg-purple-500 hover:bg-purple-600 text-white' }} rounded-lg transition-all duration-200"
                                            style="color: white !important;">
                                             Admin Dashboard
                                         </a>
 
                                         @if(auth()->user()->isAdmin() && \Illuminate\Support\Facades\Route::has('admin.users.index'))
                                             <a href="{{ route('admin.users.index') }}" 
-                                               class="px-4 py-2 text-base font-semibold {{ request()->routeIs('admin.users.*') ? 'bg-indigo-100 text-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
+                                               class="px-3 py-1.5 text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'bg-indigo-100 text-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600 text-white' }} rounded-lg transition-all duration-200"
                                                style="color: white !important;">
                                                 Manage Users
                                             </a>
@@ -92,18 +92,18 @@
                                     @endif
 
                                     <div class="relative">
-                                        <button type="button" id="profileDropdownBtn" class="px-4 py-2 text-base font-semibold rounded-xl flex items-center gap-2 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200 shadow-sm">
+                                        <button type="button" id="profileDropdownBtn" class="px-3 py-1.5 text-sm font-medium rounded-lg flex items-center gap-1.5 bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all duration-200">
                                             <i class="fa fa-user"></i>
                                             <span>Profile</span>
-                                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                            <svg class="w-3 h-3 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                                         </button>
                                         
-                                        <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-3 z-50 border border-gray-100" style="display: none;">
-                                            <a href="{{ route('profile.picture') }}" class="block px-5 py-3 text-base text-gray-700 hover:bg-gray-50 rounded-xl">Update Profile Picture</a>
+                                        <div id="profileDropdownMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100" style="display: none;">
+                                            <a href="{{ route('profile.picture') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Update Profile Picture</a>
                                             
                                             <form method="POST" action="{{ route('logout') }}" class="block w-full">
                                                 @csrf
-                                                <button type="submit" class="w-full text-left px-5 py-3 text-base text-red-600 hover:bg-red-50 font-semibold transition-colors">
+                                                <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium transition-colors">
                                                     Logout
                                                 </button>
                                             </form>
@@ -113,11 +113,11 @@
                             
                             @else
                                 <a href="{{ route('login') }}" 
-                                   class="px-4 py-2 text-base font-semibold {{ request()->routeIs('login') ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-blue-600' }} rounded-xl transition-all duration-200 shadow-sm">
+                                   class="px-3 py-1.5 text-sm font-medium {{ request()->routeIs('login') ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:text-blue-600' }} rounded-lg transition-all duration-200">
                                     Login
                                 </a>
                                 <a href="{{ route('register') }}" 
-                                   class="px-4 py-2 text-base font-semibold {{ request()->routeIs('register') ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500 hover:bg-emerald-600 text-white' }} rounded-xl transition-all duration-200 shadow-sm"
+                                   class="px-3 py-1.5 text-sm font-medium {{ request()->routeIs('register') ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500 hover:bg-emerald-600 text-white' }} rounded-lg transition-all duration-200"
                                    style="color: white !important;">
                                     Register
                                 </a>
@@ -126,7 +126,7 @@
 
                         <div class="md:hidden flex items-center">
                             <button type="button" 
-                                    class="bg-gray-50 inline-flex items-center justify-center p-3 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-200 shadow-sm"
+                                    class="bg-gray-50 inline-flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-all duration-200"
                                     aria-controls="mobile-menu" 
                                     aria-expanded="false"
                                     onclick="toggleMobileMenu()">
