@@ -42,10 +42,12 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Apache Configuration
-# [FIX] Disable extra MPM modules - Apache can only load ONE MPM at a time
-# mpm_prefork is required for mod_php (non-thread-safe)
-RUN a2dismod mpm_event mpm_worker 2>/dev/null || true \
-    && a2enmod mpm_prefork rewrite
+# [FIX] Disable ALL MPM modules first, then enable ONLY mpm_prefork
+# Apache can only load ONE MPM at a time - mpm_prefork is required for mod_php
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf /etc/apache2/mods-enabled/mpm_*.load \
+    && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
+    && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
+    && a2enmod rewrite
 
 # [FIX] Suppress the "Could not reliably determine the server's fully qualified domain name" warning
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
