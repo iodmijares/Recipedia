@@ -29,7 +29,7 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($userId)],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            // Password changes are not allowed through admin panel for security
             'role' => ['required', 'string', Rule::in(['user', 'moderator', 'admin'])],
         ];
     }

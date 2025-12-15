@@ -49,24 +49,19 @@
                     @enderror
                 </div>
 
+                <!-- Password Management Notice -->
                 <div class="border-t border-gray-200 pt-6 mt-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Change Password</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label for="password" class="block text-gray-700 text-sm font-semibold mb-2">New Password:</label>
-                            <input type="password" name="password" id="password" 
-                                   class="form-input w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 @error('password') border-red-500 @enderror">
-                            @error('password')
-                                <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-                        <div>
-                            <label for="password_confirmation" class="block text-gray-700 text-sm font-semibold mb-2">Confirm New Password:</label>
-                            <input type="password" name="password_confirmation" id="password_confirmation" 
-                                   class="form-input w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-blue-500 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <h3 class="text-sm font-semibold text-blue-800">Password Security</h3>
+                                <p class="text-sm text-blue-700 mt-1">For security reasons, admins cannot change user passwords. Users must use the "Forgot Password" feature to reset their own passwords.</p>
+                            </div>
                         </div>
                     </div>
-                    <p class="text-gray-600 text-xs mt-1">Leave password fields blank if you don't want to change the password.</p>
                 </div>
 
                 <div class="flex items-center justify-between mt-8">

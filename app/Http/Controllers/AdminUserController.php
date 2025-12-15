@@ -90,9 +90,9 @@ class AdminUserController extends Controller
         $user->email = $validated['email'];
         $user->role = $validated['role'];
 
-        if (!empty($validated['password'])) {
-            $user->password = Hash::make($validated['password']);
-        }
+        // Password changes are not allowed through admin panel for security
+        // Users must use the "Forgot Password" feature to reset their own passwords
+        
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
