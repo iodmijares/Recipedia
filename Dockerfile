@@ -80,15 +80,12 @@ COPY --from=node_builder /app/public/build /var/www/html/public/build
 # 8. Permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# [FIX] Forcefully disable conflicting MPMs and enable mpm_prefork
-# We run this late in the build process to ensure no other steps have re-enabled them.
-# We manually remove the symlinks to be absolutely sure.
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_event.conf \
-    && rm -f /etc/apache2/mods-enabled/mpm_worker.load \
-    && rm -f /etc/apache2/mods-enabled/mpm_worker.conf \
-    && a2dismod mpm_event mpm_worker || true \
-    && a2enmod mpm_prefork
+# [FIX] Forcefully disable ALL MPMs and enable ONLY mpm_prefork
+# Apache can only have ONE MPM loaded at a time
+# Using wildcard removal to ensure clean state
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load /etc/apache2/mods-enabled/mpm_*.conf \
+    && ln -sf ../mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
+    && ln -sf ../mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf
 
 # 9. Entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh

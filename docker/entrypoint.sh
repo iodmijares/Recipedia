@@ -3,6 +3,14 @@
 # Exit on fail
 set -e
 
+# [FIX] Ensure only mpm_prefork is loaded (prevents "More than one MPM loaded" error)
+echo "🔧 Ensuring correct Apache MPM configuration..."
+rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* 2>/dev/null || true
+if [ ! -L /etc/apache2/mods-enabled/mpm_prefork.load ]; then
+    ln -sf ../mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load
+    ln -sf ../mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf
+fi
+
 # 1. Run Setup Tasks (Keep these, they are working great!)
 echo "🚀 Running Laravel setup tasks..."
 php artisan migrate --force
